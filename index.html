@@ -316,16 +316,15 @@
   }
   .o-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(58,138,92,.25)}
 
-  .o-photo{max-width:860px;padding:32px 44px;display:flex;gap:36px;align-items:center;text-align:left}
+  .o-photo{max-width:620px;padding:28px 40px 24px}
   .o-img {
-    width:260px;height:260px;flex-shrink:0;
-    border-radius:22px;overflow:hidden;
+    width:100%;max-width:340px;aspect-ratio:1;
+    border-radius:22px;overflow:hidden;margin:0 auto 16px;
     box-shadow:0 12px 40px rgba(0,0,0,.08);
     background:#F5F0E8;display:flex;align-items:center;justify-content:center;
   }
-  .o-photo-right{flex:1;min-width:0}
-  .o-cap{font-family:'Nunito',sans-serif;font-size:26px;color:var(--text);font-weight:700;margin-bottom:4px}
-  .o-sender{font-size:20px;color:var(--text-muted);margin-bottom:28px;font-weight:500}
+  .o-cap{font-family:'Nunito',sans-serif;font-size:24px;color:var(--text);font-weight:700;margin-bottom:2px}
+  .o-sender{font-size:18px;color:var(--text-muted);margin-bottom:16px;font-weight:500}
   .reactions{display:flex;flex-direction:column;align-items:center;gap:12px;position:relative}
   .rrow{display:flex;gap:18px}
   .rbtn {
@@ -578,17 +577,15 @@
     <div class="ocard o-photo">
       <button class="oclose" onclick="shut(event,'p',1)">✕</button>
       <div class="o-img" id="mF"></div>
-      <div class="o-photo-right">
-        <div class="o-cap" id="mC"></div>
-        <div class="o-sender" id="mS"></div>
-        <div class="reactions" id="rA">
-          <div class="rrow">
-            <div class="rbtn" onclick="react(event,'love')">❤️</div>
-            <div class="rbtn" onclick="react(event,'laugh')">😂</div>
-            <div class="rbtn" onclick="react(event,'celebrate')">🎉</div>
-          </div>
-          <div class="rlabel" id="rL">Tap to react</div>
+      <div class="o-cap" id="mC"></div>
+      <div class="o-sender" id="mS"></div>
+      <div class="reactions" id="rA">
+        <div class="rrow">
+          <div class="rbtn" onclick="react(event,'love')">❤️</div>
+          <div class="rbtn" onclick="react(event,'laugh')">😂</div>
+          <div class="rbtn" onclick="react(event,'celebrate')">🎉</div>
         </div>
+        <div class="rlabel" id="rL">Tap to react</div>
       </div>
     </div>
   </div>
