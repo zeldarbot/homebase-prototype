@@ -644,44 +644,7 @@ body {
 }
 .toast.show { transform:translateY(0);opacity:1 }
 
-/* ===== DEMO BAR ===== */
-.demo-bar {
-  position:fixed;bottom:0;left:0;right:0;
-  display:flex;align-items:center;justify-content:center;gap:16px;
-  padding:10px 16px max(10px, env(safe-area-inset-bottom, 10px));
-  background:rgba(44,36,32,.92);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  font-family:'Inter',sans-serif;z-index:200;
-}
-.demo-label {
-  font-size:10px;font-weight:700;letter-spacing:2px;
-  text-transform:uppercase;color:rgba(255,255,255,.25);
-}
-.modes {
-  display:flex;gap:2px;
-  background:rgba(255,255,255,.06);padding:3px;border-radius:10px;
-}
-.modes button {
-  padding:7px 14px;border:none;background:transparent;
-  color:rgba(255,255,255,.3);font-family:'Inter',sans-serif;
-  font-size:11px;font-weight:600;border-radius:7px;
-  cursor:pointer;transition:all .2s;letter-spacing:.3px;
-}
-.modes button:hover { color:rgba(255,255,255,.6) }
-.modes button.on { background:rgba(255,255,255,.1);color:rgba(255,255,255,.85) }
-.demo-toggle {
-  position:fixed;bottom:max(16px, env(safe-area-inset-bottom, 16px));right:16px;
-  width:40px;height:40px;border-radius:50%;
-  background:rgba(44,36,32,.7);border:none;
-  color:rgba(255,255,255,.6);font-size:18px;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;z-index:201;
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  transition:all .2s;
-}
-.demo-toggle:active { transform:scale(.9) }
-.demo-bar.hidden { transform:translateY(100%);pointer-events:none;opacity:0;transition:all .3s }
-.proto { display:none }
+/* demo bar removed */
 </style>
 </head>
 <body>
@@ -1296,38 +1259,9 @@ body {
   <div class="toast" id="toast"></div>
 </div>
 
-<!-- Demo Toggle -->
-<button class="demo-toggle" id="demo-toggle" onclick="toggleDemo()">···</button>
-<div class="demo-bar hidden" id="demo-bar">
-  <div class="demo-label">Screen</div>
-  <div class="modes" id="demo-modes">
-    <button class="on" onclick="goScreen('home')">Today</button>
-    <button onclick="goScreen('weekly')">Week</button>
-    <button onclick="goScreen('voice')">Voice</button>
-    <button onclick="goScreen('photo')">Photo</button>
-    <button onclick="goScreen('ai')">AI Chat</button>
-    <button onclick="goScreen('add-task')">Add Task</button>
-    <button onclick="goScreen('onboard')">Setup</button>
-  </div>
-</div>
+
 
 <script>
-// === DEMO TOGGLE ===
-function toggleDemo() {
-  var bar = document.getElementById('demo-bar');
-  var btn = document.getElementById('demo-toggle');
-  bar.classList.toggle('hidden');
-  btn.style.display = bar.classList.contains('hidden') ? '' : 'none';
-}
-document.addEventListener('click', function(e) {
-  var bar = document.getElementById('demo-bar');
-  var btn = document.getElementById('demo-toggle');
-  if (!bar.classList.contains('hidden') && !bar.contains(e.target) && e.target !== btn) {
-    bar.classList.add('hidden');
-    btn.style.display = '';
-  }
-});
-
 // === SCREEN NAVIGATION ===
 function goScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -1349,11 +1283,6 @@ function goScreen(id) {
     t.classList.toggle('active', ds === id);
   });
 
-  // Update demo bar
-  var labels = { home:'Today', weekly:'Week', voice:'Voice', photo:'Photo', ai:'AI Chat', 'add-task':'Add Task', onboard:'Setup', settings:'Settings' };
-  document.querySelectorAll('#demo-modes button').forEach(function(b) {
-    b.classList.toggle('on', b.textContent === (labels[id] || ''));
-  });
 }
 
 // === TASK TOGGLE ===
