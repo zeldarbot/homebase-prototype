@@ -779,14 +779,12 @@ function goFullscreen(){
   // iOS Safari doesn't support Fullscreen API — fake it
   if(/iPhone|iPad/.test(navigator.userAgent)&&!document.fullscreenEnabled){
     isManualFullscreen=true;
-    f.style.zoom='';
     f.style.position='fixed';f.style.inset='0';f.style.zIndex='9999';
-    f.style.width='100vw';f.style.height='100vh';
+    f.style.width='1194px';f.style.height='834px';
     f.style.borderRadius='0';
-    f.style.transform='';
-    // Scale to fill viewport
     const s=Math.min(window.innerWidth/1194,window.innerHeight/834);
-    f.style.zoom=s;
+    f.style.transform='scale('+s+')';
+    f.style.transformOrigin='0 0';
     document.body.style.overflow='hidden';
     // Add exit button
     let ex=document.getElementById('fsExit');
@@ -817,6 +815,12 @@ document.addEventListener('fullscreenchange',()=>{
 // === RESPONSIVE SCALING ===
 function scaleFrame(){
   const f=document.getElementById('mainFrame');
+  const wrap=f.parentElement;
+
+  // Reset first so measurements are clean
+  f.style.transform='';f.style.zoom='';
+  wrap.style.width='';wrap.style.height='';
+
   const w=window.innerWidth, h=window.innerHeight;
   const isMobile=w<1024||(w<1200&&'ontouchstart' in window);
   const isLandscape=w>h;
@@ -824,7 +828,8 @@ function scaleFrame(){
   // If in iOS fake fullscreen, rescale to new orientation
   if(isManualFullscreen&&f.style.position==='fixed'){
     const s=Math.min(w/1194,h/834);
-    f.style.zoom=s;
+    f.style.transform='scale('+s+')';
+    f.style.transformOrigin='0 0';
     return;
   }
 
@@ -836,20 +841,18 @@ function scaleFrame(){
     } else {
       s=w/1194;
     }
-    f.style.zoom=s;
-    f.style.transform='';
-    f.parentElement.style.width=isLandscape?Math.floor(1194*s)+'px':'100%';
-    f.parentElement.style.height='';
+    f.style.transform='scale('+s+')';
+    f.style.transformOrigin='0 0';
+    wrap.style.width=Math.floor(1194*s)+'px';
+    wrap.style.height=Math.floor(834*s)+'px';
+    wrap.style.overflow='hidden';
     f.style.borderRadius='0';
     document.body.style.padding='0';
     document.body.style.background='#FAF7F2';
     document.body.style.justifyContent='flex-start';
     document.body.style.alignItems=isLandscape?'center':'stretch';
   } else {
-    f.style.zoom='';
-    f.style.transform='';
-    f.parentElement.style.width='';
-    f.parentElement.style.height='';
+    wrap.style.overflow='';
     f.style.borderRadius='18px';
     document.body.style.padding='20px';
     document.body.style.background='#1a1814';
@@ -858,14 +861,13 @@ function scaleFrame(){
   }
 }
 scaleFrame();
-window.addEventListener('resize',scaleFrame);
-// iOS needs multiple delayed fires for orientation changes
+// Debounced resize handler
+let _st;
+function _rescale(){clearTimeout(_st);_st=setTimeout(scaleFrame,60)}
+window.addEventListener('resize',_rescale);
 window.addEventListener('orientationchange',()=>{
-  setTimeout(scaleFrame,50);setTimeout(scaleFrame,150);setTimeout(scaleFrame,400);
+  setTimeout(scaleFrame,50);setTimeout(scaleFrame,200);setTimeout(scaleFrame,500);
 });
-// Also catch resize events that iOS fires after orientation
-let resizeTimer;
-window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(scaleFrame,100)});
 </script>
 </body>
 </html>
