@@ -69,7 +69,7 @@
     position:relative;box-shadow:0 40px 120px rgba(0,0,0,.5);
     transform-origin:0 0;
   }
-  .frame-wrap{overflow:hidden;border-radius:18px}
+  .frame-wrap{border-radius:18px}
   @media (max-width:1024px){
     body{padding:0;background:#FAF7F2 !important;justify-content:flex-start !important}
     .demo-bar{flex-direction:column;gap:8px;margin-bottom:0;padding:12px 12px 8px;
@@ -780,11 +780,9 @@ function goFullscreen(){
   if(/iPhone|iPad/.test(navigator.userAgent)&&!document.fullscreenEnabled){
     isManualFullscreen=true;
     f.style.position='fixed';f.style.inset='0';f.style.zIndex='9999';
-    f.style.width='1194px';f.style.height='834px';
     f.style.borderRadius='0';
-    const s=Math.min(window.innerWidth/1194,window.innerHeight/834);
-    f.style.transform='scale('+s+')';
-    f.style.transformOrigin='0 0';
+    f.style.zoom=Math.min(window.innerWidth/1194,window.innerHeight/834);
+    f.style.transform='';
     document.body.style.overflow='hidden';
     // Add exit button
     let ex=document.getElementById('fsExit');
@@ -815,58 +813,22 @@ document.addEventListener('fullscreenchange',()=>{
 // === RESPONSIVE SCALING ===
 function scaleFrame(){
   const f=document.getElementById('mainFrame');
-  const wrap=f.parentElement;
-
-  // Reset first so measurements are clean
-  f.style.transform='';f.style.zoom='';
-  wrap.style.width='';wrap.style.height='';
-
-  const w=window.innerWidth, h=window.innerHeight;
-  const isMobile=w<1024||(w<1200&&'ontouchstart' in window);
-  const isLandscape=w>h;
-
-  // If in iOS fake fullscreen, rescale to new orientation
-  if(isManualFullscreen&&f.style.position==='fixed'){
-    const s=Math.min(w/1194,h/834);
-    f.style.transform='scale('+s+')';
-    f.style.transformOrigin='0 0';
-    return;
-  }
-
-  if(isMobile){
-    let s;
-    if(isLandscape){
-      const barH=document.querySelector('.demo-bar')?.offsetHeight||40;
-      s=Math.min(w/1194,(h-barH)/834);
+  // Reset zoom so we get true viewport dimensions
+  f.style.zoom='1';
+  f.style.transform='';
+  requestAnimationFrame(()=>{
+    const w=window.innerWidth;
+    if(w<1194){
+      f.style.zoom=(w/1194);
     } else {
-      s=w/1194;
+      f.style.zoom='1';
     }
-    f.style.transform='scale('+s+')';
-    f.style.transformOrigin='0 0';
-    wrap.style.width=Math.floor(1194*s)+'px';
-    wrap.style.height=Math.floor(834*s)+'px';
-    wrap.style.overflow='hidden';
-    f.style.borderRadius='0';
-    document.body.style.padding='0';
-    document.body.style.background='#FAF7F2';
-    document.body.style.justifyContent='flex-start';
-    document.body.style.alignItems=isLandscape?'center':'stretch';
-  } else {
-    wrap.style.overflow='';
-    f.style.borderRadius='18px';
-    document.body.style.padding='20px';
-    document.body.style.background='#1a1814';
-    document.body.style.justifyContent='center';
-    document.body.style.alignItems='center';
-  }
+  });
 }
 scaleFrame();
-// Debounced resize handler
-let _st;
-function _rescale(){clearTimeout(_st);_st=setTimeout(scaleFrame,60)}
-window.addEventListener('resize',_rescale);
+window.addEventListener('resize',scaleFrame);
 window.addEventListener('orientationchange',()=>{
-  setTimeout(scaleFrame,50);setTimeout(scaleFrame,200);setTimeout(scaleFrame,500);
+  scaleFrame();setTimeout(scaleFrame,100);setTimeout(scaleFrame,300);setTimeout(scaleFrame,600);
 });
 </script>
 </body>
