@@ -61,6 +61,8 @@
   .demo-actions button.da-reminder:hover{background:rgba(184,134,62,.2)}
   .demo-actions button.da-photo{background:rgba(58,138,92,.12);color:#3A8A5C}
   .demo-actions button.da-photo:hover{background:rgba(58,138,92,.2)}
+  .da-fs{padding:7px 16px;border-radius:8px;border:none;background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);font-family:'Inter',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.3px;white-space:nowrap}
+  .da-fs:hover{background:rgba(255,255,255,.18);color:rgba(255,255,255,.85)}
 
   .frame {
     width:1194px;height:834px;border-radius:18px;overflow:hidden;
@@ -82,7 +84,7 @@
     .frame{border-radius:0 !important;box-shadow:none !important}
     .frame-wrap{border-radius:0}
     .proto{color:rgba(0,0,0,.2) !important}
-    #fsBtn{background:rgba(0,0,0,.06) !important;color:rgba(0,0,0,.5) !important;padding:12px 28px !important;font-size:14px !important;width:100%}
+    .da-fs{background:rgba(0,0,0,.06) !important;color:rgba(0,0,0,.5) !important;padding:10px 20px !important;font-size:13px !important;width:100%;text-align:center}
   }
   @media (max-width:1024px) and (orientation:landscape){
     .demo-bar{flex-direction:row;gap:10px;padding:6px 12px}
@@ -419,6 +421,8 @@
     <button onclick="go('night')">9 PM</button>
   </div>
   <div class="demo-sep"></div>
+  <button id="fsBtn" onclick="goFullscreen()" class="da-fs">⛶ Full Screen</button>
+  <div class="demo-sep"></div>
   <div class="demo-label">Simulate</div>
   <div class="demo-actions">
     <button class="da-voice" onclick="notify('voice','New voice message','From Sarah — 12 seconds','voice')">🎙️ Voice</button>
@@ -655,10 +659,7 @@
   </div>
 
 </div></div>
-<div style="display:flex;align-items:center;gap:12px;margin-top:10px">
-  <button id="fsBtn" onclick="goFullscreen()" style="padding:10px 24px;border-radius:12px;border:none;background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.5px;transition:all .2s">⛶ Full Screen Mode</button>
-  <span class="proto" style="margin:0">HomeBase by LifeLions — Interactive Prototype</span>
-</div>
+<div class="proto">HomeBase by LifeLions — Interactive Prototype</div>
 
 <script>
 // === NOTIFICATION SOUND (soft wooden knock — single, brief, ambient) ===
