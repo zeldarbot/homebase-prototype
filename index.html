@@ -79,12 +79,8 @@
   .header {
     position:relative;z-index:20;
     display:flex;align-items:flex-end;justify-content:space-between;
-    margin-bottom:8px;
-    padding:12px 0 8px;
-    background:rgba(250,247,242,.85);
-    backdrop-filter:blur(12px);
-    margin:-40px -50px 8px;padding:40px 50px 8px;
-    border-radius:0 0 0 0;
+    margin:-40px -50px 8px;padding:40px 50px 12px;
+    background:var(--bg);
   }
   .h-time {
     font-family:'Nunito',sans-serif;font-size:80px;
@@ -210,7 +206,7 @@
 
   /* ===== NOTIFICATIONS ===== */
   .notif-overlay {
-    position:absolute;inset:0;z-index:10;padding-top:80px;
+    position:absolute;inset:0;z-index:10;
     background:rgba(28,24,20,.35);
     backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
     display:flex;align-items:center;justify-content:center;
@@ -273,7 +269,6 @@
     background:rgba(28,24,20,.4);
     backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
     z-index:10;display:flex;align-items:center;justify-content:center;
-    padding-top:80px;
     opacity:0;pointer-events:none;transition:opacity .4s;
   }
   .overlay.visible{opacity:1;pointer-events:all}
