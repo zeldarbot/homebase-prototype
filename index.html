@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HomeBase</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAF7F2;
+    --card: #FFFFFF;
+    --text: #2C2420;
+    --text-soft: #4A3F38;
+    --text-muted: #7A6E66;
+    --green: #3A8A5C;
+    --green-soft: #EDF6F0;
+    --green-deep: #2A6B44;
+    --coral: #D4725C;
+    --amber: #B8863E;
+    --amber-soft: #FBF5EC;
+    --sand: #D9D0C6;
+    --ws: rgba(44,36,32,.06);
+    --wm: rgba(44,36,32,.1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body {
+    font-family:'Inter',sans-serif;background:#1a1814;
+    min-height:100vh;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;padding:20px;
+  }
+
+  .modes {
+    display:flex;gap:2px;margin-bottom:14px;
+    background:rgba(255,255,255,.04);padding:3px;border-radius:10px;
+  }
+  .modes button {
+    padding:7px 18px;border:none;background:transparent;
+    color:rgba(255,255,255,.3);font-family:'Inter',sans-serif;
+    font-size:11px;font-weight:600;border-radius:7px;
+    cursor:pointer;transition:all .2s;letter-spacing:.3px;
+  }
+  .modes button:hover{color:rgba(255,255,255,.6)}
+  .modes button.on{background:rgba(255,255,255,.1);color:rgba(255,255,255,.85)}
+
+  .frame {
+    width:1194px;height:834px;border-radius:18px;overflow:hidden;
+    position:relative;box-shadow:0 40px 120px rgba(0,0,0,.5);
+  }
+  .state{position:absolute;inset:0;display:none}
+  .state.on{display:flex}
+
+  /* ===== CANVAS ===== */
+  .canvas {
+    width:100%;height:100%;display:flex;flex-direction:column;
+    background:
+      radial-gradient(ellipse at 75% 15%, rgba(212,168,92,.04) 0%, transparent 45%),
+      radial-gradient(ellipse at 20% 10%, rgba(58,138,92,.03) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 85%, rgba(162,132,98,.03) 0%, transparent 40%),
+      linear-gradient(175deg, #FDFAF6 0%, #FAF7F0 30%, #F6F1EA 70%, #F2EDE4 100%);
+    padding:44px 64px 36px;
+    position:relative;overflow:hidden;
+  }
+  /* ===== LANDSCAPE BACKGROUND ===== */
+  .canvas{background-size:cover;background-position:center bottom;background-repeat:no-repeat;position:relative}
+  #s-morning .canvas{background-image:url(bg/morning.png)}
+  #s-mid .canvas{background-image:url(bg/midmorning.png)}
+  #s-afternoon .canvas{background-image:url(bg/afternoon.png)}
+  #s-evening .canvas{background-image:url(bg/evening.png)}
+  /* Cream wash overlay — softens the landscape into a background */
+  .canvas::after {
+    content:'';position:absolute;inset:0;z-index:0;
+    background:rgba(250,247,242,.55);
+  }
+
+  /* Ensure content sits above the landscape */
+  .greeting,.main,.upcoming-wrap{position:relative;z-index:1}
+
+  /* ===== HEADER ===== */
+  .header {
+    position:relative;z-index:20;
+    display:flex;align-items:flex-end;justify-content:space-between;
+    margin-bottom:8px;
+  }
+  .h-time {
+    font-family:'Nunito',sans-serif;font-size:80px;
+    font-weight:800;color:var(--text);line-height:1;letter-spacing:1px;
+  }
+  .h-sep{font-weight:300;animation:blink 2.5s ease-in-out infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+  .h-period {
+    font-family:'Inter',sans-serif;font-size:24px;font-weight:700;
+    color:var(--text-soft);letter-spacing:2px;
+    display:inline-block;margin-left:8px;
+    transform:translateY(-14px);vertical-align:baseline;
+  }
+  .header-right{text-align:right;padding-bottom:8px}
+  .h-day {
+    font-family:'Nunito',sans-serif;font-size:34px;font-weight:800;
+    color:var(--text);line-height:1.2;
+  }
+  .h-date {
+    font-family:'Nunito',sans-serif;font-size:26px;font-weight:600;
+    color:var(--text-soft);line-height:1.3;
+  }
+
+  .greeting {
+    font-family:'Nunito',sans-serif;font-size:28px;font-weight:700;
+    color:var(--text-soft);margin-bottom:28px;
+  }
+
+  /* ===== MAIN ===== */
+  .main {flex:1;display:flex;gap:24px;min-height:0}
+
+  /* Tasks */
+  .tasks-col{flex:1;display:flex;flex-direction:column;gap:14px}
+  .task {
+    display:flex;align-items:center;gap:22px;
+    background:var(--card);border-radius:22px;
+    padding:26px 30px;cursor:pointer;user-select:none;
+    box-shadow:0 0 0 1px rgba(0,0,0,.02),0 2px 6px var(--ws),0 8px 20px var(--ws);
+    transition:all .5s cubic-bezier(.175,.885,.32,1.275);
+  }
+  .task:hover{box-shadow:0 0 0 1px rgba(0,0,0,.02),0 6px 18px var(--wm);transform:translateY(-1px)}
+  .task:active{transform:scale(.985);transition:all .12s}
+  .task.done{transform:scale(.98)}
+  .task.done .check{background:var(--green);border-color:var(--green)}
+  .task.done .check svg{opacity:1}
+  .task.done .task-name{text-decoration:line-through;text-decoration-color:var(--green);text-decoration-thickness:2px;color:var(--text-muted)}
+
+  .check {
+    width:52px;height:52px;border-radius:50%;flex-shrink:0;
+    border:3px solid var(--sand);display:flex;
+    align-items:center;justify-content:center;
+    transition:all .4s cubic-bezier(.175,.885,.32,1.275);
+  }
+  .check svg {
+    width:22px;height:22px;stroke:white;stroke-width:3;
+    fill:none;stroke-linecap:round;stroke-linejoin:round;
+    opacity:0;transition:opacity .3s;
+  }
+  .check:hover{border-color:var(--green);transform:scale(1.06)}
+
+  .task-name {
+    font-family:'Nunito',sans-serif;font-size:28px;
+    font-weight:700;color:var(--text);line-height:1.3;
+  }
+
+  /* Messages */
+  .msgs-col{width:380px;flex-shrink:0;display:flex;flex-direction:column;gap:14px}
+  .msg {
+    background:var(--card);border-radius:22px;padding:26px 28px;
+    cursor:pointer;position:relative;
+    box-shadow:0 0 0 1px rgba(0,0,0,.02),0 2px 6px var(--ws),0 8px 20px var(--ws);
+    transition:all .25s;display:flex;align-items:center;gap:18px;
+  }
+  .msg:hover{box-shadow:0 6px 20px var(--wm);transform:translateY(-1px)}
+  .msg:active{transform:scale(.985)}
+  .msg-icon {
+    width:56px;height:56px;border-radius:18px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .msg-icon svg{width:24px;height:24px;stroke:white;stroke-width:2;fill:none}
+  .mi-voice{background:linear-gradient(135deg,var(--green),var(--green-deep))}
+  .mi-photo{background:linear-gradient(135deg,var(--coral),#B85A46)}
+  .mi-video{background:linear-gradient(135deg,var(--amber),#9A7030)}
+  .msg-from {
+    font-family:'Nunito',sans-serif;font-size:24px;
+    font-weight:700;color:var(--text);line-height:1.3;
+  }
+  .msg-label{font-size:20px;color:var(--text-soft);font-weight:500;margin-top:2px}
+  .msg-dot {
+    position:absolute;top:18px;right:20px;
+    width:10px;height:10px;border-radius:50%;
+    background:var(--coral);box-shadow:0 0 0 3px rgba(212,114,92,.12);
+  }
+
+  /* ===== UPCOMING ===== */
+  .upcoming-wrap{margin-top:18px;flex-shrink:0}
+  .upcoming-label {
+    font-family:'Nunito',sans-serif;font-size:20px;font-weight:700;
+    color:var(--text-soft);margin-bottom:8px;
+  }
+  .upcoming {
+    display:flex;align-items:center;gap:16px;
+    padding:18px 28px;border-radius:18px;
+    background:rgba(255,255,255,.92);
+    border:2px solid rgba(196,148,74,.25);
+    backdrop-filter:blur(8px);
+  }
+  .upcoming svg {
+    width:26px;height:26px;stroke:var(--amber);stroke-width:2.5;
+    fill:none;flex-shrink:0;
+  }
+  .u-text{font-size:22px;color:var(--text-soft);font-weight:700;flex:1}
+  .u-time {
+    font-family:'Nunito',sans-serif;font-size:28px;
+    font-weight:800;color:var(--amber);flex-shrink:0;
+  }
+  .upcoming.soon{background:rgba(255,255,255,.92);border-color:rgba(212,114,92,.3)}
+  .upcoming.soon svg{stroke:var(--coral)}
+  .upcoming.soon .u-time{color:var(--coral)}
+  .upcoming.dinner{background:rgba(255,255,255,.92);border-color:rgba(58,138,92,.25)}
+  .upcoming.dinner svg{stroke:var(--green)}
+  .upcoming.dinner .u-time{color:var(--green)}
+
+  /* ===== NOTIFICATIONS ===== */
+  .notif-overlay {
+    position:absolute;inset:0;z-index:10;
+    background:rgba(28,24,20,.35);
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;transition:opacity .5s ease;
+  }
+  .notif-overlay.show{opacity:1;pointer-events:auto}
+  .notif-overlay.hide{opacity:0;pointer-events:none;transition:opacity .3s ease}
+  .notif-card {
+    background:var(--card);border-radius:32px;
+    padding:48px 56px;max-width:540px;width:85%;
+    text-align:center;cursor:pointer;
+    box-shadow:0 32px 80px rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.04);
+    transform:translateY(20px) scale(.97);opacity:0;
+    transition:transform .5s cubic-bezier(.175,.885,.32,1.275) .1s,opacity .4s ease .1s;
+  }
+  .notif-overlay.show .notif-card{transform:translateY(0) scale(1);opacity:1}
+  .notif-overlay.hide .notif-card{transform:translateY(20px) scale(.97);opacity:0;transition:transform .25s ease,opacity .25s ease}
+  .notif-nicon{width:80px;height:80px;border-radius:24px;display:flex;align-items:center;justify-content:center;margin:0 auto 28px}
+  .notif-nicon svg{width:36px;height:36px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .notif-nicon.ni-voice{background:linear-gradient(135deg,var(--green),var(--green-deep));box-shadow:0 12px 32px rgba(58,138,92,.2);animation:vp 3s ease-in-out infinite}
+  .notif-nicon.ni-reminder{background:linear-gradient(135deg,var(--amber),#9A7030);box-shadow:0 12px 32px rgba(184,134,62,.2);animation:vp 3s ease-in-out infinite}
+  .notif-nicon.ni-photo{background:linear-gradient(135deg,var(--green),var(--green-deep));box-shadow:0 12px 32px rgba(58,138,92,.2);animation:vp 3s ease-in-out infinite}
+  .notif-title{font-family:'Nunito',sans-serif;font-size:28px;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:8px}
+  .notif-sub{font-size:22px;color:var(--text-muted);font-weight:500;margin-bottom:36px}
+  .notif-btn {
+    display:inline-block;
+    padding:18px 52px;border-radius:18px;border:none;
+    font-family:'Nunito',sans-serif;font-size:22px;font-weight:700;
+    color:white;cursor:pointer;
+    transition:all .3s;letter-spacing:.3px;
+  }
+  .notif-btn.nb-voice{background:var(--green);box-shadow:0 8px 24px rgba(58,138,92,.2)}
+  .notif-btn.nb-reminder{background:var(--amber);box-shadow:0 8px 24px rgba(184,134,62,.2)}
+  .notif-btn.nb-photo{background:var(--green);box-shadow:0 8px 24px rgba(58,138,92,.2)}
+  .notif-btn:hover{transform:translateY(-2px)}
+
+  /* ===== NIGHT ===== */
+  .night-canvas {
+    width:100%;height:100%;
+    background:linear-gradient(165deg,#0C0A08,#16120E 50%,#0E0C0A);
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+  }
+  .night-time {
+    font-family:'Nunito',sans-serif;font-size:172px;
+    font-weight:800;color:rgba(255,248,240,.06);letter-spacing:6px;line-height:1;
+  }
+  .night-period {
+    font-family:'Nunito',sans-serif;font-size:28px;font-weight:600;
+    color:rgba(255,248,240,.03);letter-spacing:4px;margin-top:12px;
+  }
+  .night-msg {
+    font-family:'Nunito',sans-serif;font-size:24px;font-weight:500;
+    color:rgba(255,248,240,.04);margin-top:40px;
+  }
+
+  /* ===== OVERLAYS ===== */
+  .overlay {
+    position:absolute;inset:0;
+    background:rgba(28,24,20,.4);
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    z-index:10;display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;transition:opacity .4s;
+  }
+  .overlay.visible{opacity:1;pointer-events:all}
+  .ocard {
+    background:var(--card);border-radius:32px;
+    padding:56px 60px;max-width:620px;width:90%;
+    text-align:center;position:relative;
+    box-shadow:0 32px 80px rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.04);
+    transform:translateY(20px) scale(.97);
+    transition:transform .5s cubic-bezier(.175,.885,.32,1.275);
+  }
+  .overlay.visible .ocard{transform:translateY(0) scale(1)}
+  .oclose {
+    position:absolute;top:22px;right:26px;
+    width:48px;height:48px;border-radius:50%;border:none;
+    background:rgba(0,0,0,.05);color:var(--text-muted);
+    font-size:22px;cursor:pointer;display:flex;
+    align-items:center;justify-content:center;transition:all .2s;
+  }
+  .oclose:hover{background:rgba(0,0,0,.08);color:var(--text)}
+
+  .o-vicon {
+    width:88px;height:88px;border-radius:26px;
+    background:linear-gradient(135deg,var(--green),var(--green-deep));
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 32px;
+    box-shadow:0 12px 32px rgba(58,138,92,.2);
+    animation:vp 3s ease-in-out infinite;
+  }
+  .o-vicon svg{width:40px;height:40px;stroke:white;stroke-width:2;fill:none}
+  @keyframes vp{
+    0%,100%{transform:scale(1);box-shadow:0 12px 32px rgba(58,138,92,.2)}
+    50%{transform:scale(1.04);box-shadow:0 16px 40px rgba(58,138,92,.28)}
+  }
+  .o-quote {
+    font-family:'Nunito',sans-serif;font-size:28px;
+    font-weight:600;color:var(--text);line-height:1.6;margin-bottom:12px;
+  }
+  .o-from{font-size:22px;color:var(--text-muted);margin-bottom:40px;font-weight:500}
+  .o-btn {
+    background:var(--green);color:white;border:none;
+    padding:20px 56px;border-radius:18px;
+    font-family:'Nunito',sans-serif;font-size:22px;font-weight:700;
+    cursor:pointer;transition:all .3s;letter-spacing:.3px;
+    box-shadow:0 8px 24px rgba(58,138,92,.2);
+  }
+  .o-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(58,138,92,.25)}
+
+  .o-photo{max-width:700px;padding:48px 52px}
+  .o-img {
+    width:100%;max-width:400px;aspect-ratio:1;
+    border-radius:22px;overflow:hidden;margin:0 auto 28px;
+    box-shadow:0 12px 40px rgba(0,0,0,.08);
+    background:#F5F0E8;display:flex;align-items:center;justify-content:center;
+  }
+  .o-cap{font-family:'Nunito',sans-serif;font-size:26px;color:var(--text);font-weight:700;margin-bottom:4px}
+  .o-sender{font-size:20px;color:var(--text-muted);margin-bottom:36px;font-weight:500}
+  .reactions{display:flex;flex-direction:column;align-items:center;gap:12px;position:relative}
+  .rrow{display:flex;gap:18px}
+  .rbtn {
+    width:76px;height:76px;border-radius:50%;
+    border:3px solid var(--sand);background:var(--card);
+    display:inline-flex;align-items:center;justify-content:center;
+    font-size:34px;cursor:pointer;
+    transition:all .35s cubic-bezier(.175,.885,.32,1.275);
+    box-shadow:0 2px 8px rgba(0,0,0,.03);position:relative;z-index:2;
+  }
+  .rbtn:hover{transform:scale(1.15);box-shadow:0 6px 20px rgba(0,0,0,.06)}
+  .rbtn:active{transform:scale(.85)}
+  .rbtn.on{transform:scale(1.15);box-shadow:0 8px 28px rgba(0,0,0,.1)}
+  .rbtn.on.love{background:#D4725C;border-color:#D4725C}
+  .rbtn.on.laugh{background:var(--amber);border-color:var(--amber)}
+  .rbtn.on.celebrate{background:var(--green);border-color:var(--green)}
+  .rlabel{font-size:20px;color:var(--text-muted);font-weight:500;min-height:24px;transition:all .4s}
+  .rlabel.sent{color:var(--green);font-weight:600}
+  .fem{position:absolute;pointer-events:none;z-index:1;animation:fu 1.4s ease-out forwards}
+  @keyframes fu{
+    0%{opacity:1;transform:translateY(0) scale(.4)}
+    40%{opacity:1;transform:translateY(-60px) scale(1.3)}
+    100%{opacity:0;transform:translateY(-160px) scale(.6)}
+  }
+
+  .proto{margin-top:14px;font-size:9px;color:rgba(255,255,255,.08);letter-spacing:3px;text-transform:uppercase}
+</style>
+</head>
+<body>
+
+<div class="modes">
+  <button class="on" onclick="go('morning')">8 AM</button>
+  <button onclick="go('mid')">10 AM</button>
+  <button onclick="go('afternoon')">1 PM</button>
+  <button onclick="go('evening')">6 PM</button>
+  <button onclick="go('night')">9 PM</button>
+</div>
+
+<div class="frame">
+
+  <!-- 8 AM -->
+  <div class="state on" id="s-morning">
+    <div class="canvas">
+      <div class="header">
+        <div><div class="h-time">8<span class="h-sep">:</span>47<span class="h-period">AM</span></div></div>
+        <div class="header-right"><div class="h-day">Wednesday</div><div class="h-date">March 11, 2026</div></div>
+      </div>
+      <div class="greeting">Good morning, Margaret</div>
+      <div class="main">
+        <div class="tasks-col">
+          <div class="task" onclick="done(this)">
+            <div class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="task-name">Take morning medication</div>
+          </div>
+          <div class="task" onclick="done(this)">
+            <div class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="task-name">Eat breakfast</div>
+          </div>
+          <div class="task" onclick="done(this)">
+            <div class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="task-name">Water the plants</div>
+          </div>
+        </div>
+        <div class="msgs-col">
+          <div class="msg" onclick="voice('&quot;Don\'t forget your appointment with Dawn today at 2. Love you, Mom!&quot;','Sarah')">
+            <div class="msg-icon mi-voice"><svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></div>
+            <div>
+              <div class="msg-from">Sarah</div>
+              <div class="msg-label">Voice message</div>
+            </div>
+            <div class="msg-dot"></div>
+          </div>
+          <div class="msg" onclick="photo('https://images.unsplash.com/photo-1531983412531-1f49a365ffed?w=600&h=600&fit=crop&crop=faces','Lucy\'s first day of school!','Sarah')">
+            <div class="msg-icon mi-photo"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+            <div>
+              <div class="msg-from">Sarah</div>
+              <div class="msg-label">Photo</div>
+            </div>
+            <div class="msg-dot"></div>
+          </div>
+        </div>
+      </div>
+      <div class="upcoming-wrap">
+        <div class="upcoming-label">Coming up</div>
+        <div class="upcoming">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <div class="u-text">Appointment with Dawn</div>
+          <div class="u-time">2:00 pm</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10 AM -->
+  <div class="state" id="s-mid">
+    <div class="canvas">
+      <div class="header">
+        <div><div class="h-time">10<span class="h-sep">:</span>23<span class="h-period">AM</span></div></div>
+        <div class="header-right"><div class="h-day">Wednesday</div><div class="h-date">March 11, 2026</div></div>
+      </div>
+      <div class="greeting">Good morning, Margaret</div>
+      <div class="main">
+        <div class="tasks-col">
+          <div class="task" onclick="done(this)">
+            <div class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="task-name">Take morning medication</div>
+          </div>
+          <div class="task" onclick="done(this)">
+            <div class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="task-name">Eat breakfast</div>
+          </div>
+          <div class="task" onclick="done(this)">
+            <div class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="task-name">Water the plants</div>
+          </div>
+        </div>
+        <div class="msgs-col">
+          <div class="msg" onclick="photo('https://images.unsplash.com/photo-1531983412531-1f49a365ffed?w=600&h=600&fit=crop&crop=faces','Lucy\'s first day of school!','Sarah')">
+            <div class="msg-icon mi-photo"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+            <div>
+              <div class="msg-from">Sarah</div>
+              <div class="msg-label">Photo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="upcoming-wrap">
+        <div class="upcoming-label">Coming up</div>
+        <div class="upcoming">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <div class="u-text">Appointment with Dawn</div>
+          <div class="u-time">2:00 pm</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1 PM -->
+  <div class="state" id="s-afternoon">
+    <div class="canvas">
+      <div class="header">
+        <div><div class="h-time">1<span class="h-sep">:</span>15<span class="h-period">PM</span></div></div>
+        <div class="header-right"><div class="h-day">Wednesday</div><div class="h-date">March 11, 2026</div></div>
+      </div>
+      <div class="greeting">Good afternoon, Margaret</div>
+      <div class="main">
+        <div class="tasks-col">
+          <div class="task" onclick="done(this)">
+            <div class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="task-name">Lunch</div>
+          </div>
+          <div class="task" onclick="done(this)">
+            <div class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="task-name">Take afternoon medication</div>
+          </div>
+        </div>
+        <div class="msgs-col">
+          <div class="msg" onclick="voice('&quot;Hey Mom, just checking in! Don\'t forget Dawn is coming at 2. Love you!&quot;','Sarah')">
+            <div class="msg-icon mi-voice"><svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></div>
+            <div>
+              <div class="msg-from">Sarah</div>
+              <div class="msg-label">Voice message</div>
+            </div>
+            <div class="msg-dot"></div>
+          </div>
+        </div>
+      </div>
+      <div class="upcoming-wrap">
+        <div class="upcoming-label">Up next</div>
+        <div class="upcoming soon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <div class="u-text">Appointment with Dawn</div>
+          <div class="u-time">2:00 pm</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6 PM -->
+  <div class="state" id="s-evening">
+    <div class="canvas">
+      <div class="header">
+        <div><div class="h-time">6<span class="h-sep">:</span>15<span class="h-period">PM</span></div></div>
+        <div class="header-right"><div class="h-day">Wednesday</div><div class="h-date">March 11, 2026</div></div>
+      </div>
+      <div class="greeting">Good evening, Margaret</div>
+      <div class="main">
+        <div class="tasks-col">
+          <div class="task" onclick="done(this)">
+            <div class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="task-name">Take evening medication</div>
+          </div>
+          <div class="task" onclick="done(this)">
+            <div class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="task-name">Set out clothes for tomorrow</div>
+          </div>
+        </div>
+        <div class="msgs-col">
+          <div class="msg" onclick="voice('&quot;Goodnight Mom! The kids loved seeing you. Sleep well, we love you.&quot;','Sarah')">
+            <div class="msg-icon mi-voice"><svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></div>
+            <div>
+              <div class="msg-from">Sarah</div>
+              <div class="msg-label">Goodnight message</div>
+            </div>
+            <div class="msg-dot"></div>
+          </div>
+          <div class="msg" onclick="photo('https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?w=600&h=600&fit=crop&crop=faces','The kids made you a card!','Megan',1)">
+            <div class="msg-icon mi-video"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            <div>
+              <div class="msg-from">Megan</div>
+              <div class="msg-label">Video</div>
+            </div>
+            <div class="msg-dot"></div>
+          </div>
+        </div>
+      </div>
+      <div class="upcoming-wrap">
+        <div class="upcoming-label">Up next</div>
+        <div class="upcoming dinner">
+          <svg viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+          <div class="u-text">Megan and the kids are coming for dinner</div>
+          <div class="u-time">6:30 pm</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9 PM -->
+  <div class="state" id="s-night">
+    <div class="night-canvas">
+      <div class="night-time">9<span style="animation:blink 3s ease-in-out infinite">:</span>41</div>
+      <div class="night-period">PM</div>
+      <div class="night-msg">Goodnight, Margaret</div>
+    </div>
+  </div>
+
+  <!-- Voice overlay -->
+  <div class="overlay" id="ov-v" onclick="shut(event,'v')">
+    <div class="ocard">
+      <button class="oclose" onclick="shut(event,'v',1)">✕</button>
+      <div class="o-vicon"><svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></div>
+      <div class="o-quote" id="vT"></div>
+      <div class="o-from" id="vF"></div>
+      <button class="o-btn" onclick="shut(event,'v')">Got it</button>
+    </div>
+  </div>
+
+  <!-- Photo overlay -->
+  <div class="overlay" id="ov-p" onclick="shut(event,'p')">
+    <div class="ocard o-photo">
+      <button class="oclose" onclick="shut(event,'p',1)">✕</button>
+      <div class="o-img" id="mF"></div>
+      <div class="o-cap" id="mC"></div>
+      <div class="o-sender" id="mS"></div>
+      <div class="reactions" id="rA">
+        <div class="rrow">
+          <div class="rbtn" onclick="react(event,'love')">❤️</div>
+          <div class="rbtn" onclick="react(event,'laugh')">😂</div>
+          <div class="rbtn" onclick="react(event,'celebrate')">🎉</div>
+        </div>
+        <div class="rlabel" id="rL">Tap to react</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+  <button onclick="notify('voice','New voice message','From Sarah — 12 seconds','voice')" style="padding:6px 14px;border-radius:8px;border:1px solid #D4725C;background:none;color:#D4725C;cursor:pointer;font-size:13px">🎙️ Voice Notif</button>
+  <button onclick="notify('reminder','Time for afternoon medication','Daily reminder — 2:00 PM','reminder')" style="padding:6px 14px;border-radius:8px;border:1px solid #B8863E;background:none;color:#B8863E;cursor:pointer;font-size:13px">⏰ Reminder Notif</button>
+  <button onclick="notify('photo','New photo from Lucy','Shared a moment with you','photo')" style="padding:6px 14px;border-radius:8px;border:1px solid #3A8A5C;background:none;color:#3A8A5C;cursor:pointer;font-size:13px">📸 Photo Notif</button>
+</div>
+<div class="proto">HomeBase by LifeLions — v1.4</div>
+
+<script>
+// === NOTIFICATION SOUND (soft wooden knock — single, brief, ambient) ===
+const AudioCtx=window.AudioContext||window.webkitAudioContext;
+let audioCtx;
+function chime(){
+  if(!audioCtx)audioCtx=new AudioCtx();
+  const t=audioCtx.currentTime;
+  function tap(freq,time){
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type='sine';o.frequency.value=freq;
+    o.frequency.exponentialRampToValueAtTime(freq*.975,time+.6);
+    g.gain.setValueAtTime(0,time);
+    g.gain.linearRampToValueAtTime(.1,time+.008);
+    g.gain.exponentialRampToValueAtTime(.02,time+.12);
+    g.gain.exponentialRampToValueAtTime(.001,time+.7);
+    o.connect(g);g.connect(audioCtx.destination);
+    o.start(time);o.stop(time+.7);
+    // Body
+    const o2=audioCtx.createOscillator(),g2=audioCtx.createGain();
+    o2.type='sine';o2.frequency.value=freq*.5;
+    g2.gain.setValueAtTime(0,time);
+    g2.gain.linearRampToValueAtTime(.035,time+.008);
+    g2.gain.exponentialRampToValueAtTime(.001,time+.4);
+    o2.connect(g2);g2.connect(audioCtx.destination);
+    o2.start(time);o2.stop(time+.4);
+  }
+  tap(523,t);     // first tap — C5
+  tap(659,t+.25); // second tap — E5, steps up gently
+}
+
+// === NOTIFICATION SYSTEM (modal style) ===
+function notify(type,title,sub,action){
+  chime();
+  const icons={
+    voice:'<svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>',
+    reminder:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    photo:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>'
+  };
+  const btnLabels={voice:'Listen now',reminder:'Got it',photo:'View photo'};
+  const activeState=document.querySelector('.state.on .canvas')||document.querySelector('.state.on');
+  if(!activeState)return;
+  // Remove any existing notification overlay
+  const old=activeState.querySelector('.notif-overlay');if(old)old.remove();
+  const overlay=document.createElement('div');
+  overlay.className='notif-overlay';
+  overlay.innerHTML=`<div class="notif-card"><div class="notif-nicon ni-${type}">${icons[type]||icons.reminder}</div><div class="notif-title">${title}</div><div class="notif-sub">${sub}</div><button class="notif-btn nb-${type}">${btnLabels[type]||'Open'}</button></div>`;
+  function dismiss(){
+    overlay.classList.add('hide');
+    setTimeout(()=>overlay.remove(),400);
+  }
+  overlay.querySelector('.notif-btn').onclick=function(e){
+    e.stopPropagation();dismiss();
+    if(action==='voice')voice("Hey Margaret, it's Sarah! Just wanted to remind you I'll be picking you up at 2 for your appointment with Dawn. Wear something comfy. Love you!","Sarah");
+    else if(action==='photo')photo('https://images.unsplash.com/photo-1531983412531-1f49a365ffed?w=600&h=600&fit=crop&crop=faces','Look what Lucy drew today!','Sarah');
+  };
+  overlay.onclick=function(){dismiss()};
+  overlay.querySelector('.notif-card').onclick=function(e){e.stopPropagation()};
+  activeState.appendChild(overlay);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>overlay.classList.add('show')));
+  // Auto-dismiss after 12 seconds
+  setTimeout(()=>{if(overlay.parentNode&&overlay.classList.contains('show'))dismiss()},12000);
+}
+
+function go(s){
+  document.querySelectorAll('.state').forEach(e=>e.classList.remove('on'));
+  document.querySelectorAll('.modes button').forEach(b=>b.classList.remove('on'));
+  document.getElementById('s-'+s)?.classList.add('on');
+  const m={morning:'8',mid:'10',afternoon:'1',evening:'6',night:'9'};
+  document.querySelectorAll('.modes button').forEach(b=>{if(m[s]&&b.textContent.trim().startsWith(m[s]+' '))b.classList.add('on')});
+}
+function voice(t,f){document.getElementById('vT').innerHTML=t;document.getElementById('vF').textContent='\u2014 '+f;document.getElementById('ov-v').classList.add('visible')}
+function photo(url,cap,sender,vid){
+  const f=document.getElementById('mF');
+  f.innerHTML=vid?'<div style="position:relative;width:100%;height:100%"><img src="'+url+'" style="width:100%;height:100%;object-fit:cover"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><div style="width:76px;height:76px;background:rgba(255,255,255,.92);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.1)"><svg width="30" height="30" viewBox="0 0 24 24" fill="var(--text)" stroke="none"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div></div>':'<img src="'+url+'" style="width:100%;height:100%;object-fit:cover">';
+  document.getElementById('mC').textContent=cap;document.getElementById('mS').textContent='From '+sender;
+  document.querySelectorAll('.rbtn').forEach(b=>b.classList.remove('on','love','laugh','celebrate'));
+  document.getElementById('rL').textContent='Tap to react';document.getElementById('rL').classList.remove('sent');
+  document.getElementById('ov-p').classList.add('visible');
+}
+function shut(e,t,force){
+  if(!force){const c=document.querySelector('#ov-'+t+' .ocard');if(c&&c.contains(e.target)&&!e.target.classList.contains('o-btn'))return;}
+  e.stopPropagation();document.getElementById('ov-'+t).classList.remove('visible');
+}
+function done(el){
+  if(el.classList.contains('done')){
+    el.classList.remove('done');el.style.transition='transform .3s ease';el.style.transform='scale(1)';
+    return;
+  }
+  el.classList.add('done');el.style.transition='transform .1s';el.style.transform='scale(.97)';
+  setTimeout(()=>{el.style.transition='transform .5s cubic-bezier(.175,.885,.32,1.275)';el.style.transform='scale(.98)'},100);
+}
+function react(e,type){
+  e.stopPropagation();
+  const area=document.getElementById('rA'),label=document.getElementById('rL'),btn=e.currentTarget;
+  document.querySelectorAll('.rbtn').forEach(b=>b.classList.remove('on','love','laugh','celebrate'));
+  btn.classList.add('on',type);
+  const em={love:['❤️','💛','🧡','💕','❤️','💗','❤️'],laugh:['😂','🤣','😄','😆','😂','✨','😂'],celebrate:['🎉','🥳','🎊','✨','🎉','⭐','🎉']};
+  (em[type]||em.love).forEach((e,i)=>{setTimeout(()=>{const s=document.createElement('span');s.className='fem';s.textContent=e;s.style.left=(10+Math.random()*80)+'%';s.style.animationDuration=(1+Math.random()*.8)+'s';s.style.fontSize=(22+Math.random()*20)+'px';area.appendChild(s);setTimeout(()=>s.remove(),2000)},i*60)});
+  btn.style.transition='all .1s';btn.style.transform='scale(1.5)';
+  setTimeout(()=>{btn.style.transition='all .5s cubic-bezier(.175,.885,.32,1.275)';btn.style.transform='scale(1.15)'},100);
+  const sender=document.getElementById('mS').textContent.replace('From ','');
+  label.textContent={love:sender+' will see your ❤️',laugh:sender+' will see your 😂',celebrate:sender+' will see your 🎉'}[type];
+  label.classList.add('sent');
+}
+</script>
+</body>
+</html>
