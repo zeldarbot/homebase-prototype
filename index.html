@@ -81,7 +81,8 @@
     .demo-actions{width:100%}
     .frame{border-radius:0 !important;box-shadow:none !important}
     .frame-wrap{border-radius:0}
-    .proto{color:rgba(0,0,0,.2) !important;padding:12px}
+    .proto{color:rgba(0,0,0,.2) !important}
+    #fsBtn{background:rgba(0,0,0,.06) !important;color:rgba(0,0,0,.5) !important;padding:12px 28px !important;font-size:14px !important;width:100%}
   }
   @media (max-width:1024px) and (orientation:landscape){
     .demo-bar{flex-direction:row;gap:10px;padding:6px 12px}
@@ -654,7 +655,10 @@
   </div>
 
 </div></div>
-<div class="proto">HomeBase by LifeLions — Interactive Prototype</div>
+<div style="display:flex;align-items:center;gap:12px;margin-top:10px">
+  <button id="fsBtn" onclick="goFullscreen()" style="padding:10px 24px;border-radius:12px;border:none;background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.5px;transition:all .2s">⛶ Full Screen Mode</button>
+  <span class="proto" style="margin:0">HomeBase by LifeLions — Interactive Prototype</span>
+</div>
 
 <script>
 // === NOTIFICATION SOUND (soft wooden knock — single, brief, ambient) ===
@@ -764,6 +768,48 @@ function react(e,type){
   label.textContent={love:sender+' will see your ❤️',laugh:sender+' will see your 😂',celebrate:sender+' will see your 🎉'}[type];
   label.classList.add('sent');
 }
+// === FULLSCREEN MODE ===
+function goFullscreen(){
+  const f=document.getElementById('mainFrame');
+  const el=f;
+  if(el.requestFullscreen)el.requestFullscreen();
+  else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();
+  else if(el.webkitEnterFullscreen)el.webkitEnterFullscreen();
+  // iOS Safari doesn't support Fullscreen API — lock to landscape + hide UI
+  if(/iPhone|iPad/.test(navigator.userAgent)&&!document.fullscreenEnabled){
+    f.style.zoom='';
+    f.style.position='fixed';f.style.inset='0';f.style.zIndex='9999';
+    f.style.width='100vw';f.style.height='100vh';
+    f.style.borderRadius='0';
+    f.style.transform='';
+    // Scale to fill viewport
+    const s=Math.min(window.innerWidth/1194,window.innerHeight/834);
+    f.style.zoom=s;
+    document.body.style.overflow='hidden';
+    // Add exit button
+    let ex=document.getElementById('fsExit');
+    if(!ex){ex=document.createElement('button');ex.id='fsExit';
+      ex.textContent='✕ Exit Full Screen';
+      ex.style.cssText='position:fixed;top:12px;right:12px;z-index:10000;padding:8px 18px;border-radius:10px;border:none;background:rgba(0,0,0,.5);color:#fff;font-size:13px;font-family:Inter,sans-serif;font-weight:600;cursor:pointer;backdrop-filter:blur(8px)';
+      ex.onclick=exitFullscreen;document.body.appendChild(ex);
+    }
+    ex.style.display='block';
+  }
+}
+function exitFullscreen(){
+  if(document.exitFullscreen)document.exitFullscreen();
+  else if(document.webkitExitFullscreen)document.webkitExitFullscreen();
+  const f=document.getElementById('mainFrame');
+  f.style.position='';f.style.inset='';f.style.zIndex='';
+  f.style.width='1194px';f.style.height='834px';
+  document.body.style.overflow='';
+  const ex=document.getElementById('fsExit');if(ex)ex.style.display='none';
+  scaleFrame();
+}
+document.addEventListener('fullscreenchange',()=>{
+  if(!document.fullscreenElement){const f=document.getElementById('mainFrame');f.style.borderRadius='18px';scaleFrame()}
+});
+
 // === RESPONSIVE SCALING ===
 function scaleFrame(){
   const f=document.getElementById('mainFrame');
