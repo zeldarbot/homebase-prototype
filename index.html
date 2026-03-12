@@ -73,7 +73,7 @@
   @media (max-width:1024px){
     body{padding:0;background:#FAF7F2 !important;justify-content:flex-start !important}
     .demo-bar{flex-direction:column;gap:8px;margin-bottom:0;padding:12px 12px 8px;
-      background:rgba(0,0,0,.03);position:sticky;top:0;z-index:50}
+      background:rgba(0,0,0,.03);position:sticky;top:0;z-index:50;order:0}
     .demo-label{color:rgba(0,0,0,.2)}
     .demo-sep{display:none}
     .modes{background:rgba(0,0,0,.06);width:100%;justify-content:center}
@@ -87,13 +87,8 @@
     .da-fs{background:rgba(0,0,0,.06) !important;color:rgba(0,0,0,.5) !important;padding:10px 20px !important;font-size:13px !important;width:100%;text-align:center}
   }
   @media (max-width:1024px) and (orientation:landscape){
-    .demo-bar{flex-direction:row;gap:10px;padding:6px 12px}
-    .demo-label{display:none}
-    .modes{width:auto}
-    .modes button{padding:5px 12px;font-size:11px;flex:none}
-    .demo-actions{width:auto}
-    .demo-actions button{padding:5px 12px;font-size:11px;flex:none}
-    .demo-sep{display:block;background:rgba(0,0,0,.08)}
+    .demo-bar{position:static !important;order:2}
+    .frame-wrap{order:1}
     .proto{display:none}
   }
   .state{position:absolute;inset:0;display:none}
@@ -813,12 +808,17 @@ document.addEventListener('fullscreenchange',()=>{
 // === RESPONSIVE SCALING ===
 function scaleFrame(){
   const f=document.getElementById('mainFrame');
-  // Reset zoom so we get true viewport dimensions
   f.style.zoom='1';
   f.style.transform='';
   requestAnimationFrame(()=>{
     const w=window.innerWidth;
-    if(w<1194){
+    const h=window.innerHeight;
+    const isLandscape=w>h&&w<1024;
+    if(isLandscape){
+      // Landscape mobile: scale to fill viewport height
+      const s=Math.min(w/1194,h/834);
+      f.style.zoom=s;
+    } else if(w<1194){
       f.style.zoom=(w/1194);
     } else {
       f.style.zoom='1';
