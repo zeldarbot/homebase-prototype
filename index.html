@@ -30,9 +30,15 @@
     overflow-x:hidden;
   }
 
+  /* ===== DEMO TOOLBAR ===== */
+  .demo-bar {
+    display:flex;align-items:center;gap:20px;margin-bottom:16px;
+    font-family:'Inter',sans-serif;
+  }
+  .demo-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25)}
   .modes {
-    display:flex;gap:2px;margin-bottom:14px;
-    background:rgba(255,255,255,.04);padding:3px;border-radius:10px;
+    display:flex;gap:2px;
+    background:rgba(255,255,255,.06);padding:3px;border-radius:10px;
   }
   .modes button {
     padding:7px 18px;border:none;background:transparent;
@@ -42,6 +48,19 @@
   }
   .modes button:hover{color:rgba(255,255,255,.6)}
   .modes button.on{background:rgba(255,255,255,.1);color:rgba(255,255,255,.85)}
+  .demo-sep{width:1px;height:20px;background:rgba(255,255,255,.08)}
+  .demo-actions{display:flex;gap:6px}
+  .demo-actions button {
+    padding:6px 14px;border-radius:8px;border:none;
+    font-family:'Inter',sans-serif;font-size:11px;font-weight:600;
+    cursor:pointer;transition:all .2s;letter-spacing:.3px;
+  }
+  .demo-actions button.da-voice{background:rgba(212,114,92,.12);color:#D4725C}
+  .demo-actions button.da-voice:hover{background:rgba(212,114,92,.2)}
+  .demo-actions button.da-reminder{background:rgba(184,134,62,.12);color:#B8863E}
+  .demo-actions button.da-reminder:hover{background:rgba(184,134,62,.2)}
+  .demo-actions button.da-photo{background:rgba(58,138,92,.12);color:#3A8A5C}
+  .demo-actions button.da-photo:hover{background:rgba(58,138,92,.2)}
 
   .frame {
     width:1194px;height:834px;border-radius:18px;overflow:hidden;
@@ -51,13 +70,18 @@
   .frame-wrap{overflow:hidden;border-radius:18px}
   @media (max-width:1024px){
     body{padding:0;background:#FAF7F2 !important;justify-content:flex-start !important}
-    .modes{background:rgba(0,0,0,.06);margin-bottom:0;border-radius:0;padding:6px 8px;position:sticky;top:0;z-index:50}
-    .modes button{color:rgba(0,0,0,.35);padding:8px 14px;font-size:12px}
+    .demo-bar{flex-direction:column;gap:8px;margin-bottom:0;padding:12px 12px 8px;
+      background:rgba(0,0,0,.03);position:sticky;top:0;z-index:50}
+    .demo-label{color:rgba(0,0,0,.2)}
+    .demo-sep{display:none}
+    .modes{background:rgba(0,0,0,.06);width:100%;justify-content:center}
+    .modes button{color:rgba(0,0,0,.35);padding:8px 14px;font-size:12px;flex:1;text-align:center}
     .modes button.on{background:rgba(0,0,0,.08);color:rgba(0,0,0,.8)}
-    .modes button:hover{color:rgba(0,0,0,.6)}
+    .demo-actions button{font-size:12px;padding:8px 14px;flex:1}
+    .demo-actions{width:100%}
     .frame{border-radius:0 !important;box-shadow:none !important}
     .frame-wrap{border-radius:0}
-    .proto{color:rgba(0,0,0,.3) !important}
+    .proto{color:rgba(0,0,0,.2) !important;padding:12px}
   }
   .state{position:absolute;inset:0;display:none}
   .state.on{display:flex}
@@ -374,12 +398,22 @@
 </head>
 <body>
 
-<div class="modes">
-  <button class="on" onclick="go('morning')">8 AM</button>
-  <button onclick="go('mid')">10 AM</button>
-  <button onclick="go('afternoon')">1 PM</button>
-  <button onclick="go('evening')">6 PM</button>
-  <button onclick="go('night')">9 PM</button>
+<div class="demo-bar">
+  <div class="demo-label">Time of Day</div>
+  <div class="modes">
+    <button class="on" onclick="go('morning')">8 AM</button>
+    <button onclick="go('mid')">10 AM</button>
+    <button onclick="go('afternoon')">1 PM</button>
+    <button onclick="go('evening')">6 PM</button>
+    <button onclick="go('night')">9 PM</button>
+  </div>
+  <div class="demo-sep"></div>
+  <div class="demo-label">Simulate</div>
+  <div class="demo-actions">
+    <button class="da-voice" onclick="notify('voice','New voice message','From Sarah — 12 seconds','voice')">🎙️ Voice</button>
+    <button class="da-reminder" onclick="notify('reminder','Time for afternoon medication','Daily reminder — 2:00 PM','reminder')">⏰ Reminder</button>
+    <button class="da-photo" onclick="notify('photo','New photo from Lucy','Shared a moment with you','photo')">📸 Photo</button>
+  </div>
 </div>
 
 <div class="frame-wrap"><div class="frame" id="mainFrame">
@@ -610,12 +644,7 @@
   </div>
 
 </div></div>
-<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-  <button onclick="notify('voice','New voice message','From Sarah — 12 seconds','voice')" style="padding:6px 14px;border-radius:8px;border:1px solid #D4725C;background:none;color:#D4725C;cursor:pointer;font-size:13px">🎙️ Voice Notif</button>
-  <button onclick="notify('reminder','Time for afternoon medication','Daily reminder — 2:00 PM','reminder')" style="padding:6px 14px;border-radius:8px;border:1px solid #B8863E;background:none;color:#B8863E;cursor:pointer;font-size:13px">⏰ Reminder Notif</button>
-  <button onclick="notify('photo','New photo from Lucy','Shared a moment with you','photo')" style="padding:6px 14px;border-radius:8px;border:1px solid #3A8A5C;background:none;color:#3A8A5C;cursor:pointer;font-size:13px">📸 Photo Notif</button>
-</div>
-<div class="proto">HomeBase by LifeLions — v1.4</div>
+<div class="proto">HomeBase by LifeLions — Interactive Prototype</div>
 
 <script>
 // === NOTIFICATION SOUND (soft wooden knock — single, brief, ambient) ===
