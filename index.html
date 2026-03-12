@@ -73,7 +73,7 @@
   @media (max-width:1024px){
     body{padding:0;background:#FAF7F2 !important;justify-content:flex-start !important}
     .demo-bar{flex-direction:column;gap:8px;margin-bottom:0;padding:12px 12px 8px;
-      background:rgba(0,0,0,.03);order:2}
+      background:rgba(0,0,0,.03)}
     .demo-label{color:rgba(0,0,0,.2)}
     .demo-sep{display:none}
     .modes{background:rgba(0,0,0,.06);width:100%;justify-content:center}
@@ -82,13 +82,12 @@
     .demo-actions button{font-size:12px;padding:8px 14px;flex:1}
     .demo-actions{width:100%}
     .frame{border-radius:0 !important;box-shadow:none !important}
-    .frame-wrap{border-radius:0;order:1}
-    .proto{color:rgba(0,0,0,.2) !important;order:3}
+    .frame-wrap{border-radius:0}
+    .proto{color:rgba(0,0,0,.2) !important}
     .da-fs{background:rgba(0,0,0,.06) !important;color:rgba(0,0,0,.5) !important;padding:10px 20px !important;font-size:13px !important;width:100%;text-align:center}
   }
   @media (max-width:1024px) and (orientation:landscape){
-    .demo-bar{position:static !important;order:2}
-    .frame-wrap{order:1}
+    .demo-bar{position:static !important}
     .proto{display:none}
   }
   .state{position:absolute;inset:0;display:none}
@@ -406,26 +405,6 @@
 </head>
 <body>
 
-<div class="demo-bar">
-  <div class="demo-label">Time of Day</div>
-  <div class="modes">
-    <button class="on" onclick="go('morning')">8 AM</button>
-    <button onclick="go('mid')">10 AM</button>
-    <button onclick="go('afternoon')">1 PM</button>
-    <button onclick="go('evening')">6 PM</button>
-    <button onclick="go('night')">9 PM</button>
-  </div>
-  <div class="demo-sep"></div>
-  <button id="fsBtn" onclick="goFullscreen()" class="da-fs">⛶ Full Screen</button>
-  <div class="demo-sep"></div>
-  <div class="demo-label">Simulate</div>
-  <div class="demo-actions">
-    <button class="da-voice" onclick="notify('voice','New voice message','From Sarah — 12 seconds','voice')">🎙️ Voice</button>
-    <button class="da-reminder" onclick="notify('reminder','Time for afternoon medication','Daily reminder — 2:00 PM','reminder')">⏰ Reminder</button>
-    <button class="da-photo" onclick="notify('photo','New photo from Lucy','Shared a moment with you','photo')">📸 Photo</button>
-  </div>
-</div>
-
 <div class="frame-wrap"><div class="frame" id="mainFrame">
 
   <!-- 8 AM -->
@@ -654,6 +633,25 @@
   </div>
 
 </div></div>
+<div class="demo-bar">
+  <div class="demo-label">Time of Day</div>
+  <div class="modes">
+    <button class="on" onclick="go('morning')">8 AM</button>
+    <button onclick="go('mid')">10 AM</button>
+    <button onclick="go('afternoon')">1 PM</button>
+    <button onclick="go('evening')">6 PM</button>
+    <button onclick="go('night')">9 PM</button>
+  </div>
+  <div class="demo-sep"></div>
+  <button id="fsBtn" onclick="goFullscreen()" class="da-fs">⛶ Full Screen</button>
+  <div class="demo-sep"></div>
+  <div class="demo-label">Simulate</div>
+  <div class="demo-actions">
+    <button class="da-voice" onclick="notify('voice','New voice message','From Sarah — 12 seconds','voice')">🎙️ Voice</button>
+    <button class="da-reminder" onclick="notify('reminder','Time for afternoon medication','Daily reminder — 2:00 PM','reminder')">⏰ Reminder</button>
+    <button class="da-photo" onclick="notify('photo','New photo from Lucy','Shared a moment with you','photo')">📸 Photo</button>
+  </div>
+</div>
 <div class="proto">HomeBase by LifeLions — Interactive Prototype</div>
 
 <script>
