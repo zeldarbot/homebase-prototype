@@ -27,6 +27,7 @@
     font-family:'Inter',sans-serif;background:#1a1814;
     min-height:100vh;display:flex;flex-direction:column;
     align-items:center;justify-content:center;padding:20px;
+    overflow-x:hidden;
   }
 
   .modes {
@@ -45,6 +46,22 @@
   .frame {
     width:1194px;height:834px;border-radius:18px;overflow:hidden;
     position:relative;box-shadow:0 40px 120px rgba(0,0,0,.5);
+    transform-origin:top center;
+  }
+  /* Mobile portrait — scale frame to fit screen width */
+  @media (max-width:1220px){
+    .frame{transform:scale(calc(min(100vw - 20px,1194px) / 1194))}
+  }
+  @media (max-width:900px){
+    body{padding:10px}
+    .modes button{padding:6px 12px;font-size:10px}
+  }
+  /* Mobile landscape — fill viewport */
+  @media (max-height:600px) and (orientation:landscape){
+    body{padding:4px}
+    .modes{margin-bottom:4px}
+    .modes button{padding:4px 10px;font-size:9px}
+    .frame{transform:scale(calc(min(100vw - 8px,1194px) / 1194));transform-origin:top center}
   }
   .state{position:absolute;inset:0;display:none}
   .state.on{display:flex}
