@@ -30,21 +30,20 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body {
   font-family:'Inter',sans-serif;
-  background:#1a1814;
-  min-height:100vh;
+  background:var(--bg);
+  min-height:100dvh;min-height:100vh;
   display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  padding:20px;
+  align-items:center;
   overflow-x:hidden;
 }
 
-/* ===== PHONE FRAME ===== */
+/* ===== APP CONTAINER ===== */
 .phone-wrap {
-  width:390px;height:844px;
-  border-radius:44px;overflow:hidden;
+  width:100%;max-width:430px;
+  height:100dvh;height:100vh;
   position:relative;
-  box-shadow:0 40px 120px rgba(0,0,0,.5), 0 0 0 2px rgba(255,255,255,.06);
   background:var(--bg);
+  overflow:hidden;
 }
 
 /* ===== SCREEN SYSTEM ===== */
@@ -60,8 +59,8 @@ body {
 
 /* ===== STATUS BAR ===== */
 .status-bar {
-  display:flex;align-items:center;justify-content:space-between;
-  padding:14px 28px 0;flex-shrink:0;
+  display:none;
+  padding:max(14px, env(safe-area-inset-top, 14px)) 28px 0;flex-shrink:0;
   font-size:14px;font-weight:600;color:var(--text);
 }
 .sb-time { font-family:'Inter',sans-serif }
@@ -71,7 +70,7 @@ body {
 /* ===== TOP NAV ===== */
 .top-nav {
   display:flex;align-items:center;justify-content:space-between;
-  padding:8px 24px 0;flex-shrink:0;
+  padding:max(12px, env(safe-area-inset-top, 12px)) 24px 0;flex-shrink:0;
 }
 .nav-title {
   font-family:'Nunito',sans-serif;font-size:28px;
@@ -226,7 +225,7 @@ body {
 .tab-bar {
   position:sticky;bottom:0;
   display:flex;align-items:center;justify-content:space-around;
-  padding:8px 0 calc(28px + env(safe-area-inset-bottom, 0px));
+  padding:8px 0 max(16px, env(safe-area-inset-bottom, 16px));
   background:rgba(250,247,242,.95);
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   border-top:1px solid rgba(0,0,0,.04);
@@ -563,7 +562,7 @@ body {
 
 /* ===== ONBOARDING ===== */
 .onboard-screen {
-  padding:60px 32px 40px;
+  padding:max(20px, env(safe-area-inset-top, 20px)) 32px 40px;
   display:flex;flex-direction:column;
   min-height:100%;
 }
@@ -645,8 +644,12 @@ body {
 
 /* ===== DEMO BAR ===== */
 .demo-bar {
-  display:flex;align-items:center;gap:16px;margin-top:20px;
-  font-family:'Inter',sans-serif;flex-wrap:wrap;justify-content:center;
+  position:fixed;bottom:0;left:0;right:0;
+  display:flex;align-items:center;justify-content:center;gap:16px;
+  padding:10px 16px max(10px, env(safe-area-inset-bottom, 10px));
+  background:rgba(44,36,32,.92);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  font-family:'Inter',sans-serif;z-index:200;
 }
 .demo-label {
   font-size:10px;font-weight:700;letter-spacing:2px;
@@ -664,19 +667,19 @@ body {
 }
 .modes button:hover { color:rgba(255,255,255,.6) }
 .modes button.on { background:rgba(255,255,255,.1);color:rgba(255,255,255,.85) }
-.proto {
-  margin-top:10px;font-size:9px;color:rgba(255,255,255,.08);
-  letter-spacing:3px;text-transform:uppercase;
+.demo-toggle {
+  position:fixed;bottom:max(16px, env(safe-area-inset-bottom, 16px));right:16px;
+  width:40px;height:40px;border-radius:50%;
+  background:rgba(44,36,32,.7);border:none;
+  color:rgba(255,255,255,.6);font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;z-index:201;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  transition:all .2s;
 }
-
-/* ===== RESPONSIVE ===== */
-@media (max-width:430px) {
-  body { padding:0;background:var(--bg) !important;justify-content:flex-start }
-  .phone-wrap { width:100%;height:100dvh;height:100vh;border-radius:0;box-shadow:none;
-    padding-bottom:env(safe-area-inset-bottom, 0px) }
-  .demo-bar,.proto { display:none }
-  .screen { padding-bottom:env(safe-area-inset-bottom, 0px) }
-}
+.demo-toggle:active { transform:scale(.9) }
+.demo-bar.hidden { transform:translateY(100%);pointer-events:none;opacity:0;transition:all .3s }
+.proto { display:none }
 </style>
 </head>
 <body>
@@ -1346,8 +1349,9 @@ body {
   <div class="toast" id="toast"></div>
 </div>
 
-<!-- Demo Bar -->
-<div class="demo-bar">
+<!-- Demo Toggle -->
+<button class="demo-toggle" id="demo-toggle" onclick="toggleDemo()">···</button>
+<div class="demo-bar hidden" id="demo-bar">
   <div class="demo-label">Screen</div>
   <div class="modes" id="demo-modes">
     <button class="on" onclick="goScreen('home')">Today</button>
@@ -1359,9 +1363,24 @@ body {
     <button onclick="goScreen('onboard')">Setup</button>
   </div>
 </div>
-<div class="proto">HomeBase Caregiver App — Interactive Prototype</div>
 
 <script>
+// === DEMO TOGGLE ===
+function toggleDemo() {
+  var bar = document.getElementById('demo-bar');
+  var btn = document.getElementById('demo-toggle');
+  bar.classList.toggle('hidden');
+  btn.style.display = bar.classList.contains('hidden') ? '' : 'none';
+}
+document.addEventListener('click', function(e) {
+  var bar = document.getElementById('demo-bar');
+  var btn = document.getElementById('demo-toggle');
+  if (!bar.classList.contains('hidden') && !bar.contains(e.target) && e.target !== btn) {
+    bar.classList.add('hidden');
+    btn.style.display = '';
+  }
+});
+
 // === SCREEN NAVIGATION ===
 function goScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
