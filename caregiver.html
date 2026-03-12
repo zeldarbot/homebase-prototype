@@ -61,7 +61,7 @@ body {
   overscroll-behavior-y:contain;
   scroll-behavior:smooth;
   will-change:scroll-position;
-  padding-bottom:calc(80px + env(safe-area-inset-bottom, 16px));
+  padding-bottom:calc(100px + env(safe-area-inset-bottom, 20px));
 }
 .screen.active { display:flex }
 .screen::-webkit-scrollbar { display:none }
@@ -903,7 +903,7 @@ button, .task-card, .qa-btn, .tab, .nav-avatar, .nav-back {
   </div>
 
   <!-- ===== SCREEN: AI CHAT ===== -->
-  <div class="screen" id="scr-ai" style="overflow:hidden;padding-bottom:calc(140px + env(safe-area-inset-bottom, 16px))">
+  <div class="screen" id="scr-ai" style="overflow:hidden;padding-bottom:calc(160px + env(safe-area-inset-bottom, 20px))">
     <div class="status-bar" style="flex-shrink:0"><div class="sb-time">9:41</div><div class="sb-icons"></div></div>
     <div class="top-nav" style="flex-shrink:0">
       <button class="nav-back" onclick="goScreen('home')">
