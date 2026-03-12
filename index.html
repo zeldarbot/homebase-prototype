@@ -61,8 +61,7 @@
   .demo-actions button.da-reminder:hover{background:rgba(184,134,62,.2)}
   .demo-actions button.da-photo{background:rgba(58,138,92,.12);color:#3A8A5C}
   .demo-actions button.da-photo:hover{background:rgba(58,138,92,.2)}
-  .da-fs{padding:7px 16px;border-radius:8px;border:none;background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);font-family:'Inter',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.3px;white-space:nowrap}
-  .da-fs:hover{background:rgba(255,255,255,.18);color:rgba(255,255,255,.85)}
+
 
   .frame {
     width:1194px;height:834px;border-radius:18px;overflow:hidden;
@@ -84,7 +83,6 @@
     .frame{border-radius:0 !important;box-shadow:none !important}
     .frame-wrap{border-radius:0}
     .proto{color:rgba(0,0,0,.2) !important}
-    .da-fs{background:rgba(0,0,0,.06) !important;color:rgba(0,0,0,.5) !important;padding:10px 20px !important;font-size:13px !important;width:100%;text-align:center}
   }
   @media (max-width:1024px) and (orientation:landscape){
     .demo-bar{position:static !important}
@@ -643,8 +641,6 @@
     <button onclick="go('night')">9 PM</button>
   </div>
   <div class="demo-sep"></div>
-  <button id="fsBtn" onclick="goFullscreen()" class="da-fs">⛶ Full Screen</button>
-  <div class="demo-sep"></div>
   <div class="demo-label">Simulate</div>
   <div class="demo-actions">
     <button class="da-voice" onclick="notify('voice','New voice message','From Sarah — 12 seconds','voice')">🎙️ Voice</button>
@@ -762,47 +758,6 @@ function react(e,type){
   label.textContent={love:sender+' will see your ❤️',laugh:sender+' will see your 😂',celebrate:sender+' will see your 🎉'}[type];
   label.classList.add('sent');
 }
-// === FULLSCREEN MODE ===
-function goFullscreen(){
-  const f=document.getElementById('mainFrame');
-  const el=f;
-  if(el.requestFullscreen)el.requestFullscreen();
-  else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();
-  else if(el.webkitEnterFullscreen)el.webkitEnterFullscreen();
-  // iOS Safari doesn't support Fullscreen API — fake it
-  if(/iPhone|iPad/.test(navigator.userAgent)&&!document.fullscreenEnabled){
-    isManualFullscreen=true;
-    f.style.position='fixed';f.style.inset='0';f.style.zIndex='9999';
-    f.style.borderRadius='0';
-    f.style.zoom=Math.min(window.innerWidth/1194,window.innerHeight/834);
-    f.style.transform='';
-    document.body.style.overflow='hidden';
-    // Add exit button
-    let ex=document.getElementById('fsExit');
-    if(!ex){ex=document.createElement('button');ex.id='fsExit';
-      ex.textContent='✕ Exit Full Screen';
-      ex.style.cssText='position:fixed;top:12px;right:12px;z-index:10000;padding:8px 18px;border-radius:10px;border:none;background:rgba(0,0,0,.5);color:#fff;font-size:13px;font-family:Inter,sans-serif;font-weight:600;cursor:pointer;backdrop-filter:blur(8px)';
-      ex.onclick=exitFullscreen;document.body.appendChild(ex);
-    }
-    ex.style.display='block';
-  }
-}
-let isManualFullscreen=false;
-function exitFullscreen(){
-  if(document.exitFullscreen)document.exitFullscreen();
-  else if(document.webkitExitFullscreen)document.webkitExitFullscreen();
-  isManualFullscreen=false;
-  const f=document.getElementById('mainFrame');
-  f.style.position='';f.style.inset='';f.style.zIndex='';
-  f.style.width='1194px';f.style.height='834px';
-  document.body.style.overflow='';
-  const ex=document.getElementById('fsExit');if(ex)ex.style.display='none';
-  scaleFrame();
-}
-document.addEventListener('fullscreenchange',()=>{
-  if(!document.fullscreenElement){isManualFullscreen=false;const f=document.getElementById('mainFrame');f.style.borderRadius='18px';scaleFrame()}
-});
-
 // === RESPONSIVE SCALING ===
 function scaleFrame(){
   const f=document.getElementById('mainFrame');
@@ -826,7 +781,7 @@ function scaleFrame(){
 scaleFrame();
 window.addEventListener('resize',scaleFrame);
 window.addEventListener('orientationchange',()=>{
-  scaleFrame();setTimeout(scaleFrame,100);setTimeout(scaleFrame,300);setTimeout(scaleFrame,600);
+  setTimeout(()=>location.reload(),100);
 });
 </script>
 </body>
