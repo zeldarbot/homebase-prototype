@@ -48,20 +48,10 @@
     position:relative;box-shadow:0 40px 120px rgba(0,0,0,.5);
     transform-origin:top center;
   }
-  /* Mobile portrait — scale frame to fit screen width */
-  @media (max-width:1220px){
-    .frame{transform:scale(calc(min(100vw - 20px,1194px) / 1194))}
-  }
+  .frame-wrap{width:100%;max-width:1194px;display:flex;justify-content:center}
   @media (max-width:900px){
-    body{padding:10px}
-    .modes button{padding:6px 12px;font-size:10px}
-  }
-  /* Mobile landscape — fill viewport */
-  @media (max-height:600px) and (orientation:landscape){
-    body{padding:4px}
-    .modes{margin-bottom:4px}
-    .modes button{padding:4px 10px;font-size:9px}
-    .frame{transform:scale(calc(min(100vw - 8px,1194px) / 1194));transform-origin:top center}
+    body{padding:8px}
+    .modes button{padding:5px 10px;font-size:10px}
   }
   .state{position:absolute;inset:0;display:none}
   .state.on{display:flex}
@@ -386,7 +376,7 @@
   <button onclick="go('night')">9 PM</button>
 </div>
 
-<div class="frame">
+<div class="frame-wrap"><div class="frame" id="mainFrame">
 
   <!-- 8 AM -->
   <div class="state on" id="s-morning">
@@ -613,7 +603,7 @@
     </div>
   </div>
 
-</div>
+</div></div>
 <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
   <button onclick="notify('voice','New voice message','From Sarah — 12 seconds','voice')" style="padding:6px 14px;border-radius:8px;border:1px solid #D4725C;background:none;color:#D4725C;cursor:pointer;font-size:13px">🎙️ Voice Notif</button>
   <button onclick="notify('reminder','Time for afternoon medication','Daily reminder — 2:00 PM','reminder')" style="padding:6px 14px;border-radius:8px;border:1px solid #B8863E;background:none;color:#B8863E;cursor:pointer;font-size:13px">⏰ Reminder Notif</button>
@@ -729,6 +719,22 @@ function react(e,type){
   label.textContent={love:sender+' will see your ❤️',laugh:sender+' will see your 😂',celebrate:sender+' will see your 🎉'}[type];
   label.classList.add('sent');
 }
+// === RESPONSIVE SCALING ===
+function scaleFrame(){
+  const f=document.getElementById('mainFrame');
+  const w=window.innerWidth-16;
+  if(w<1194){
+    const s=w/1194;
+    f.style.transform='scale('+s+')';
+    f.parentElement.style.height=(834*s)+'px';
+  } else {
+    f.style.transform='';
+    f.parentElement.style.height='';
+  }
+}
+scaleFrame();
+window.addEventListener('resize',scaleFrame);
+window.addEventListener('orientationchange',()=>setTimeout(scaleFrame,200));
 </script>
 </body>
 </html>
