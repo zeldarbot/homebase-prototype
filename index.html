@@ -776,8 +776,9 @@ function goFullscreen(){
   if(el.requestFullscreen)el.requestFullscreen();
   else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();
   else if(el.webkitEnterFullscreen)el.webkitEnterFullscreen();
-  // iOS Safari doesn't support Fullscreen API — lock to landscape + hide UI
+  // iOS Safari doesn't support Fullscreen API — fake it
   if(/iPhone|iPad/.test(navigator.userAgent)&&!document.fullscreenEnabled){
+    isManualFullscreen=true;
     f.style.zoom='';
     f.style.position='fixed';f.style.inset='0';f.style.zIndex='9999';
     f.style.width='100vw';f.style.height='100vh';
@@ -797,9 +798,11 @@ function goFullscreen(){
     ex.style.display='block';
   }
 }
+let isManualFullscreen=false;
 function exitFullscreen(){
   if(document.exitFullscreen)document.exitFullscreen();
   else if(document.webkitExitFullscreen)document.webkitExitFullscreen();
+  isManualFullscreen=false;
   const f=document.getElementById('mainFrame');
   f.style.position='';f.style.inset='';f.style.zIndex='';
   f.style.width='1194px';f.style.height='834px';
@@ -808,23 +811,29 @@ function exitFullscreen(){
   scaleFrame();
 }
 document.addEventListener('fullscreenchange',()=>{
-  if(!document.fullscreenElement){const f=document.getElementById('mainFrame');f.style.borderRadius='18px';scaleFrame()}
+  if(!document.fullscreenElement){isManualFullscreen=false;const f=document.getElementById('mainFrame');f.style.borderRadius='18px';scaleFrame()}
 });
 
 // === RESPONSIVE SCALING ===
 function scaleFrame(){
   const f=document.getElementById('mainFrame');
   const w=window.innerWidth, h=window.innerHeight;
-  const isMobile=w<1024;
+  const isMobile=w<1024||(w<1200&&'ontouchstart' in window);
   const isLandscape=w>h;
+
+  // If in iOS fake fullscreen, rescale to new orientation
+  if(isManualFullscreen&&f.style.position==='fixed'){
+    const s=Math.min(w/1194,h/834);
+    f.style.zoom=s;
+    return;
+  }
+
   if(isMobile){
     let s;
     if(isLandscape){
-      // Landscape: fit to viewport height, accounting for demo bar (~40px)
       const barH=document.querySelector('.demo-bar')?.offsetHeight||40;
       s=Math.min(w/1194,(h-barH)/834);
     } else {
-      // Portrait: fit to width
       s=w/1194;
     }
     f.style.zoom=s;
@@ -850,7 +859,13 @@ function scaleFrame(){
 }
 scaleFrame();
 window.addEventListener('resize',scaleFrame);
-window.addEventListener('orientationchange',()=>{setTimeout(scaleFrame,100);setTimeout(scaleFrame,300)});
+// iOS needs multiple delayed fires for orientation changes
+window.addEventListener('orientationchange',()=>{
+  setTimeout(scaleFrame,50);setTimeout(scaleFrame,150);setTimeout(scaleFrame,400);
+});
+// Also catch resize events that iOS fires after orientation
+let resizeTimer;
+window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(scaleFrame,100)});
 </script>
 </body>
 </html>
