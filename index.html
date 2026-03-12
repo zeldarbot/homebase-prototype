@@ -83,6 +83,16 @@
     .frame-wrap{border-radius:0}
     .proto{color:rgba(0,0,0,.2) !important;padding:12px}
   }
+  @media (max-width:1024px) and (orientation:landscape){
+    .demo-bar{flex-direction:row;gap:10px;padding:6px 12px}
+    .demo-label{display:none}
+    .modes{width:auto}
+    .modes button{padding:5px 12px;font-size:11px;flex:none}
+    .demo-actions{width:auto}
+    .demo-actions button{padding:5px 12px;font-size:11px;flex:none}
+    .demo-sep{display:block;background:rgba(0,0,0,.08)}
+    .proto{display:none}
+  }
   .state{position:absolute;inset:0;display:none}
   .state.on{display:flex}
 
@@ -757,18 +767,28 @@ function react(e,type){
 // === RESPONSIVE SCALING ===
 function scaleFrame(){
   const f=document.getElementById('mainFrame');
-  const isMobile=window.innerWidth<1024;
+  const w=window.innerWidth, h=window.innerHeight;
+  const isMobile=w<1024;
+  const isLandscape=w>h;
   if(isMobile){
-    const s=window.innerWidth/1194;
+    let s;
+    if(isLandscape){
+      // Landscape: fit to viewport height, accounting for demo bar (~40px)
+      const barH=document.querySelector('.demo-bar')?.offsetHeight||40;
+      s=Math.min(w/1194,(h-barH)/834);
+    } else {
+      // Portrait: fit to width
+      s=w/1194;
+    }
     f.style.zoom=s;
     f.style.transform='';
-    f.parentElement.style.width='100%';
+    f.parentElement.style.width=isLandscape?Math.floor(1194*s)+'px':'100%';
     f.parentElement.style.height='';
-    f.style.borderRadius=isMobile?'0':'18px';
-    // Hide dark body bg on mobile — go full screen
+    f.style.borderRadius='0';
     document.body.style.padding='0';
     document.body.style.background='#FAF7F2';
     document.body.style.justifyContent='flex-start';
+    document.body.style.alignItems=isLandscape?'center':'stretch';
   } else {
     f.style.zoom='';
     f.style.transform='';
@@ -778,11 +798,12 @@ function scaleFrame(){
     document.body.style.padding='20px';
     document.body.style.background='#1a1814';
     document.body.style.justifyContent='center';
+    document.body.style.alignItems='center';
   }
 }
 scaleFrame();
 window.addEventListener('resize',scaleFrame);
-window.addEventListener('orientationchange',()=>setTimeout(scaleFrame,200));
+window.addEventListener('orientationchange',()=>{setTimeout(scaleFrame,100);setTimeout(scaleFrame,300)});
 </script>
 </body>
 </html>
