@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>HomeBase — Caregiver App</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -226,7 +226,7 @@ body {
 .tab-bar {
   position:sticky;bottom:0;
   display:flex;align-items:center;justify-content:space-around;
-  padding:8px 0 28px;
+  padding:8px 0 calc(28px + env(safe-area-inset-bottom, 0px));
   background:rgba(250,247,242,.95);
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   border-top:1px solid rgba(0,0,0,.04);
@@ -672,8 +672,10 @@ body {
 /* ===== RESPONSIVE ===== */
 @media (max-width:430px) {
   body { padding:0;background:var(--bg) !important;justify-content:flex-start }
-  .phone-wrap { width:100%;height:100vh;border-radius:0;box-shadow:none }
+  .phone-wrap { width:100%;height:100dvh;height:100vh;border-radius:0;box-shadow:none;
+    padding-bottom:env(safe-area-inset-bottom, 0px) }
   .demo-bar,.proto { display:none }
+  .screen { padding-bottom:env(safe-area-inset-bottom, 0px) }
 }
 </style>
 </head>
