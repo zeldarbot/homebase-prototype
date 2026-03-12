@@ -46,9 +46,9 @@
   .frame {
     width:1194px;height:834px;border-radius:18px;overflow:hidden;
     position:relative;box-shadow:0 40px 120px rgba(0,0,0,.5);
-    transform-origin:top center;
+    transform-origin:0 0;
   }
-  .frame-wrap{width:100%;max-width:1194px;display:flex;justify-content:center}
+  .frame-wrap{overflow:hidden;border-radius:18px}
   @media (max-width:900px){
     body{padding:8px}
     .modes button{padding:5px 10px;font-size:10px}
@@ -722,14 +722,17 @@ function react(e,type){
 // === RESPONSIVE SCALING ===
 function scaleFrame(){
   const f=document.getElementById('mainFrame');
-  const w=window.innerWidth-16;
-  if(w<1194){
-    const s=w/1194;
+  const wrap=f.parentElement;
+  const avail=window.innerWidth-16;
+  if(avail<1194){
+    const s=avail/1194;
     f.style.transform='scale('+s+')';
-    f.parentElement.style.height=(834*s)+'px';
+    wrap.style.width=Math.floor(1194*s)+'px';
+    wrap.style.height=Math.floor(834*s)+'px';
   } else {
     f.style.transform='';
-    f.parentElement.style.height='';
+    wrap.style.width='';
+    wrap.style.height='';
   }
 }
 scaleFrame();
