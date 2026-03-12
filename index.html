@@ -678,7 +678,11 @@ function photo(url,cap,sender,vid){
   document.getElementById('ov-p').classList.add('visible');
 }
 function shut(e,t,force){
-  if(!force){const c=document.querySelector('#ov-'+t+' .ocard');if(c&&c.contains(e.target)&&!e.target.classList.contains('o-btn'))return;}
+  if(!force){
+    const c=document.querySelector('#ov-'+t+' .ocard');
+    // Only block if click is inside card AND not on close button or action button
+    if(c&&c.contains(e.target)&&!e.target.closest('.oclose')&&!e.target.closest('.o-btn'))return;
+  }
   e.stopPropagation();document.getElementById('ov-'+t).classList.remove('visible');
 }
 function done(el){
