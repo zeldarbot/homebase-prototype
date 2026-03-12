@@ -49,9 +49,15 @@
     transform-origin:0 0;
   }
   .frame-wrap{overflow:hidden;border-radius:18px}
-  @media (max-width:900px){
-    body{padding:8px}
-    .modes button{padding:5px 10px;font-size:10px}
+  @media (max-width:1024px){
+    body{padding:0;background:#FAF7F2 !important;justify-content:flex-start !important}
+    .modes{background:rgba(0,0,0,.06);margin-bottom:0;border-radius:0;padding:6px 8px;position:sticky;top:0;z-index:50}
+    .modes button{color:rgba(0,0,0,.35);padding:8px 14px;font-size:12px}
+    .modes button.on{background:rgba(0,0,0,.08);color:rgba(0,0,0,.8)}
+    .modes button:hover{color:rgba(0,0,0,.6)}
+    .frame{border-radius:0 !important;box-shadow:none !important}
+    .frame-wrap{border-radius:0}
+    .proto{color:rgba(0,0,0,.3) !important}
   }
   .state{position:absolute;inset:0;display:none}
   .state.on{display:flex}
@@ -722,17 +728,27 @@ function react(e,type){
 // === RESPONSIVE SCALING ===
 function scaleFrame(){
   const f=document.getElementById('mainFrame');
-  const wrap=f.parentElement;
-  const avail=window.innerWidth-16;
-  if(avail<1194){
-    const s=avail/1194;
-    f.style.transform='scale('+s+')';
-    wrap.style.width=Math.floor(1194*s)+'px';
-    wrap.style.height=Math.floor(834*s)+'px';
-  } else {
+  const isMobile=window.innerWidth<1024;
+  if(isMobile){
+    const s=window.innerWidth/1194;
+    f.style.zoom=s;
     f.style.transform='';
-    wrap.style.width='';
-    wrap.style.height='';
+    f.parentElement.style.width='100%';
+    f.parentElement.style.height='';
+    f.style.borderRadius=isMobile?'0':'18px';
+    // Hide dark body bg on mobile — go full screen
+    document.body.style.padding='0';
+    document.body.style.background='#FAF7F2';
+    document.body.style.justifyContent='flex-start';
+  } else {
+    f.style.zoom='';
+    f.style.transform='';
+    f.parentElement.style.width='';
+    f.parentElement.style.height='';
+    f.style.borderRadius='18px';
+    document.body.style.padding='20px';
+    document.body.style.background='#1a1814';
+    document.body.style.justifyContent='center';
   }
 }
 scaleFrame();
