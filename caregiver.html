@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>HomeBase — Caregiver App</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FAF7F2;
+  --card: #FFFFFF;
+  --text: #2C2420;
+  --text-soft: #4A3F38;
+  --text-muted: #7A6E66;
+  --green: #3A8A5C;
+  --green-soft: #EDF6F0;
+  --green-deep: #2A6B44;
+  --coral: #D4725C;
+  --coral-soft: #FDF0EC;
+  --amber: #B8863E;
+  --amber-soft: #FBF5EC;
+  --plum: #8B5E83;
+  --plum-soft: #F5EDF3;
+  --sand: #D9D0C6;
+  --ws: rgba(44,36,32,.06);
+  --wm: rgba(44,36,32,.1);
+  --blue: #1B4FA0;
+  --blue-soft: #EDF2FA;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body {
+  font-family:'Inter',sans-serif;
+  background:#1a1814;
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:20px;
+  overflow-x:hidden;
+}
+
+/* ===== PHONE FRAME ===== */
+.phone-wrap {
+  width:390px;height:844px;
+  border-radius:44px;overflow:hidden;
+  position:relative;
+  box-shadow:0 40px 120px rgba(0,0,0,.5), 0 0 0 2px rgba(255,255,255,.06);
+  background:var(--bg);
+}
+
+/* ===== SCREEN SYSTEM ===== */
+.screen {
+  position:absolute;inset:0;
+  display:none;flex-direction:column;
+  background:var(--bg);
+  overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+}
+.screen.active { display:flex }
+.screen::-webkit-scrollbar { display:none }
+
+/* ===== STATUS BAR ===== */
+.status-bar {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 28px 0;flex-shrink:0;
+  font-size:14px;font-weight:600;color:var(--text);
+}
+.sb-time { font-family:'Inter',sans-serif }
+.sb-icons { display:flex;gap:5px;align-items:center }
+.sb-icons svg { width:16px;height:16px;fill:var(--text) }
+
+/* ===== TOP NAV ===== */
+.top-nav {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 24px 0;flex-shrink:0;
+}
+.nav-title {
+  font-family:'Nunito',sans-serif;font-size:28px;
+  font-weight:800;color:var(--text);
+}
+.nav-avatar {
+  width:40px;height:40px;border-radius:50%;
+  background:linear-gradient(135deg,var(--green),var(--green-deep));
+  display:flex;align-items:center;justify-content:center;
+  color:white;font-family:'Nunito',sans-serif;font-size:16px;font-weight:700;
+  cursor:pointer;
+}
+.nav-back {
+  display:flex;align-items:center;gap:6px;
+  font-size:16px;font-weight:600;color:var(--green);
+  cursor:pointer;background:none;border:none;
+  font-family:'Inter',sans-serif;
+}
+.nav-back svg { width:20px;height:20px;stroke:var(--green);stroke-width:2.5;fill:none }
+
+/* ===== HOME SCREEN ===== */
+.home-header {
+  padding:20px 24px 0;
+}
+.home-recipient {
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:4px;
+}
+.recipient-photo {
+  width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(135deg,var(--amber),#9A7030);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  border:2.5px solid rgba(184,134,62,.2);
+  color:white;font-family:'Nunito',sans-serif;font-size:20px;font-weight:700;
+}
+.recipient-photo svg { width:24px;height:24px;stroke:white;stroke-width:2;fill:none }
+.recipient-info h2 {
+  font-family:'Nunito',sans-serif;font-size:22px;
+  font-weight:800;color:var(--text);line-height:1.2;
+}
+.recipient-status {
+  font-size:13px;color:var(--green);font-weight:600;
+  display:flex;align-items:center;gap:5px;
+}
+.status-dot {
+  width:7px;height:7px;border-radius:50%;background:var(--green);
+  display:inline-block;
+}
+
+/* ===== SECTION ===== */
+.section { padding:0 24px;margin-top:20px }
+.section-label {
+  font-family:'Nunito',sans-serif;font-size:13px;
+  font-weight:700;color:var(--text-muted);
+  text-transform:uppercase;letter-spacing:.8px;
+  margin-bottom:10px;
+}
+
+/* ===== TASK CARDS ===== */
+.time-group { margin-bottom:16px }
+.time-header {
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:8px;
+}
+.time-icon {
+  width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.time-icon svg { width:18px;height:18px;stroke-width:2;fill:none }
+.time-label {
+  font-family:'Nunito',sans-serif;font-size:15px;
+  font-weight:700;color:var(--text-soft);
+}
+.time-count {
+  font-size:12px;color:var(--text-muted);font-weight:600;
+  margin-left:auto;
+}
+
+.task-card {
+  display:flex;align-items:center;gap:14px;
+  background:var(--card);border-radius:18px;
+  padding:16px 18px;margin-bottom:6px;
+  box-shadow:0 0 0 1px rgba(0,0,0,.02),0 2px 6px var(--ws);
+  cursor:pointer;transition:all .2s;
+  position:relative;
+}
+.task-card:active { transform:scale(.98) }
+.task-card.done { opacity:.6 }
+.task-card.done .tc-name { text-decoration:line-through;color:var(--text-muted) }
+.task-card .tc-accent {
+  position:absolute;left:0;top:0;bottom:0;width:5px;
+  border-radius:18px 0 0 18px;
+}
+.tc-accent.morning { background:var(--coral) }
+.tc-accent.afternoon { background:var(--green) }
+.tc-accent.evening { background:var(--plum) }
+
+.tc-check {
+  width:28px;height:28px;border-radius:50%;flex-shrink:0;
+  border:2.5px solid var(--sand);
+  display:flex;align-items:center;justify-content:center;
+  transition:all .3s cubic-bezier(.175,.885,.32,1.275);
+}
+.task-card.done .tc-check {
+  background:var(--green);border-color:var(--green);
+}
+.tc-check svg {
+  width:14px;height:14px;stroke:white;stroke-width:3;
+  fill:none;opacity:0;transition:opacity .2s;
+}
+.task-card.done .tc-check svg { opacity:1 }
+
+.tc-info { flex:1;min-width:0 }
+.tc-name {
+  font-family:'Nunito',sans-serif;font-size:16px;
+  font-weight:700;color:var(--text);line-height:1.3;
+}
+.tc-time {
+  font-size:12px;color:var(--text-muted);font-weight:500;margin-top:1px;
+}
+.tc-voice {
+  width:28px;height:28px;border-radius:10px;flex-shrink:0;
+  background:var(--green-soft);
+  display:flex;align-items:center;justify-content:center;
+}
+.tc-voice svg { width:14px;height:14px;stroke:var(--green);stroke-width:2;fill:none }
+
+/* ===== QUICK ACTIONS ===== */
+.quick-actions {
+  display:flex;gap:10px;padding:0 24px;margin-top:20px;
+}
+.qa-btn {
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  gap:8px;padding:16px 8px;
+  background:var(--card);border-radius:18px;
+  box-shadow:0 1px 3px var(--ws);
+  cursor:pointer;border:none;transition:all .2s;
+  font-family:'Inter',sans-serif;
+}
+.qa-btn:active { transform:scale(.95) }
+.qa-icon {
+  width:44px;height:44px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+}
+.qa-icon svg { width:22px;height:22px;stroke:white;stroke-width:2;fill:none }
+.qi-voice { background:linear-gradient(135deg,var(--green),var(--green-deep)) }
+.qi-photo { background:linear-gradient(135deg,var(--coral),#B85A46) }
+.qi-ai { background:linear-gradient(135deg,var(--blue),#143D7A) }
+.qa-label { font-size:12px;font-weight:600;color:var(--text-soft) }
+
+/* ===== BOTTOM TAB BAR ===== */
+.tab-bar {
+  position:sticky;bottom:0;
+  display:flex;align-items:center;justify-content:space-around;
+  padding:8px 0 28px;
+  background:rgba(250,247,242,.95);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-top:1px solid rgba(0,0,0,.04);
+  z-index:50;flex-shrink:0;
+  margin-top:auto;
+}
+.tab {
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;border:none;background:none;
+  padding:4px 16px;
+  font-family:'Inter',sans-serif;
+}
+.tab svg { width:24px;height:24px;stroke:var(--text-muted);stroke-width:2;fill:none;transition:all .2s }
+.tab-label { font-size:10px;font-weight:600;color:var(--text-muted);transition:all .2s }
+.tab.active svg { stroke:var(--green) }
+.tab.active .tab-label { color:var(--green) }
+.tab-badge {
+  position:absolute;top:-2px;right:10px;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--coral);
+}
+
+/* ===== VOICE RECORDING SCREEN ===== */
+.record-area {
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:0 32px;
+}
+.rec-ring {
+  width:140px;height:140px;border-radius:50%;
+  background:linear-gradient(135deg,var(--green),var(--green-deep));
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .3s cubic-bezier(.175,.885,.32,1.275);
+  box-shadow:0 12px 40px rgba(58,138,92,.25);
+  position:relative;
+}
+.rec-ring:active { transform:scale(.9) }
+.rec-ring.recording {
+  animation:rec-pulse 1.5s ease-in-out infinite;
+  background:linear-gradient(135deg,var(--coral),#B85A46);
+  box-shadow:0 12px 40px rgba(212,114,92,.3);
+}
+@keyframes rec-pulse {
+  0%,100% { transform:scale(1);box-shadow:0 12px 40px rgba(212,114,92,.3) }
+  50% { transform:scale(1.06);box-shadow:0 16px 50px rgba(212,114,92,.4) }
+}
+.rec-ring svg { width:48px;height:48px;stroke:white;stroke-width:2;fill:none }
+.rec-timer {
+  font-family:'Nunito',sans-serif;font-size:48px;
+  font-weight:800;color:var(--text);margin-top:28px;
+}
+.rec-hint {
+  font-size:16px;color:var(--text-muted);font-weight:500;
+  margin-top:8px;text-align:center;
+}
+
+/* AI analysis card */
+.ai-analysis {
+  margin:24px;padding:20px;
+  background:var(--blue-soft);border-radius:18px;
+  border:1.5px solid rgba(27,79,160,.1);
+  display:none;
+}
+.ai-analysis.show { display:block;animation:fadeUp .4s ease }
+@keyframes fadeUp {
+  from { opacity:0;transform:translateY(12px) }
+  to { opacity:1;transform:translateY(0) }
+}
+.ai-tag {
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:700;color:var(--blue);
+  text-transform:uppercase;letter-spacing:1px;
+  margin-bottom:10px;
+}
+.ai-tag svg { width:14px;height:14px;stroke:var(--blue);stroke-width:2;fill:none }
+.ai-transcript {
+  font-family:'Nunito',sans-serif;font-size:15px;
+  font-weight:600;color:var(--text);line-height:1.5;
+  margin-bottom:14px;
+}
+.ai-suggestion {
+  display:flex;align-items:center;gap:10px;
+  background:var(--card);border-radius:12px;
+  padding:12px 14px;margin-bottom:8px;
+  cursor:pointer;transition:all .2s;
+  border:1.5px solid rgba(27,79,160,.08);
+}
+.ai-suggestion:active { transform:scale(.97) }
+.ai-sug-icon {
+  width:34px;height:34px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.ai-sug-icon svg { width:16px;height:16px;stroke:white;stroke-width:2;fill:none }
+.ai-sug-icon.si-task { background:linear-gradient(135deg,var(--green),var(--green-deep));box-shadow:0 4px 12px rgba(58,138,92,.15) }
+.ai-sug-icon.si-clock { background:linear-gradient(135deg,var(--amber),#9A7030);box-shadow:0 4px 12px rgba(184,134,62,.15) }
+.ai-sug-text { font-size:14px;font-weight:600;color:var(--text);flex:1 }
+.ai-sug-action {
+  font-size:12px;font-weight:700;color:var(--green);
+  white-space:nowrap;
+}
+
+/* Schedule picker */
+.schedule-picker {
+  padding:0 24px;margin-top:16px;
+}
+.time-pill-row {
+  display:flex;gap:8px;flex-wrap:wrap;
+}
+.time-pill {
+  padding:10px 18px;border-radius:12px;
+  background:var(--card);border:2px solid rgba(0,0,0,.04);
+  font-family:'Nunito',sans-serif;font-size:14px;
+  font-weight:700;color:var(--text-soft);
+  cursor:pointer;transition:all .2s;
+}
+.time-pill:active { transform:scale(.95) }
+.time-pill.selected {
+  background:var(--green-soft);border-color:var(--green);color:var(--green);
+}
+
+/* ===== PHOTO SCREEN ===== */
+.photo-grid {
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:3px;padding:0 24px;margin-top:16px;
+}
+.photo-thumb {
+  aspect-ratio:1;border-radius:12px;overflow:hidden;
+  cursor:pointer;transition:all .2s;
+  background:#E8DFD0;
+}
+.photo-thumb:active { transform:scale(.95) }
+.photo-thumb img { width:100%;height:100%;object-fit:cover }
+
+.photo-preview {
+  flex:1;display:flex;flex-direction:column;
+  padding:20px 24px;
+}
+.photo-preview-img {
+  flex:1;border-radius:20px;overflow:hidden;
+  background:#E8DFD0;margin-bottom:16px;
+  display:flex;align-items:center;justify-content:center;
+}
+.photo-preview-img img { width:100%;height:100%;object-fit:cover }
+.caption-input {
+  width:100%;padding:14px 18px;
+  border-radius:14px;border:2px solid rgba(0,0,0,.06);
+  background:var(--card);
+  font-family:'Inter',sans-serif;font-size:15px;
+  font-weight:500;color:var(--text);
+  outline:none;transition:border-color .2s;
+}
+.caption-input:focus { border-color:var(--green) }
+.caption-input::placeholder { color:var(--sand) }
+
+/* Send button */
+.send-btn {
+  width:100%;padding:16px;border-radius:16px;
+  border:none;background:var(--green);color:white;
+  font-family:'Nunito',sans-serif;font-size:17px;
+  font-weight:700;cursor:pointer;
+  transition:all .2s;margin-top:12px;
+  box-shadow:0 4px 16px rgba(58,138,92,.2);
+}
+.send-btn:active { transform:scale(.97) }
+.send-btn:disabled { opacity:.4;cursor:default }
+
+/* ===== AI CHAT SCREEN ===== */
+.chat-messages {
+  flex:1;overflow-y:auto;padding:16px 24px 16px;
+  display:flex;flex-direction:column;gap:12px;
+  min-height:0;
+}
+.chat-messages::-webkit-scrollbar { display:none }
+
+.chat-bubble {
+  max-width:82%;padding:14px 18px;
+  border-radius:20px;line-height:1.5;
+  font-size:15px;font-weight:500;
+  animation:fadeUp .3s ease;
+}
+.chat-ai {
+  background:var(--card);color:var(--text);
+  border-bottom-left-radius:6px;
+  align-self:flex-start;
+  box-shadow:0 1px 3px var(--ws);
+}
+.chat-user {
+  background:var(--green);color:white;
+  border-bottom-right-radius:6px;
+  align-self:flex-end;
+}
+.chat-ai-label {
+  font-size:11px;font-weight:700;color:var(--green);
+  margin-bottom:4px;letter-spacing:.5px;
+}
+.chat-ai h4 {
+  font-family:'Nunito',sans-serif;font-size:15px;
+  font-weight:700;color:var(--text);margin:10px 0 6px;
+}
+.chat-ai ol, .chat-ai ul {
+  padding-left:18px;margin:6px 0;
+}
+.chat-ai li { margin-bottom:4px;font-size:14px }
+.chat-action-row {
+  display:flex;gap:8px;margin-top:10px;
+}
+.chat-action {
+  padding:8px 16px;border-radius:12px;
+  border:2px solid var(--green);
+  background:transparent;color:var(--green);
+  font-family:'Inter',sans-serif;font-size:13px;
+  font-weight:600;cursor:pointer;transition:all .2s;
+}
+.chat-action:active { background:var(--green-soft) }
+.chat-action.filled {
+  background:var(--green);color:white;border-color:var(--green);
+}
+
+.chat-input-bar {
+  position:sticky;bottom:0;
+  display:flex;align-items:center;gap:10px;
+  padding:12px 20px;
+  background:rgba(250,247,242,.95);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-top:1px solid rgba(0,0,0,.04);
+  flex-shrink:0;z-index:40;
+}
+.chat-input {
+  flex:1;padding:12px 16px;
+  border-radius:14px;border:2px solid rgba(0,0,0,.06);
+  background:var(--card);
+  font-family:'Inter',sans-serif;font-size:15px;
+  font-weight:500;color:var(--text);
+  outline:none;transition:border-color .2s;
+}
+.chat-input:focus { border-color:var(--green) }
+.chat-input::placeholder { color:var(--sand) }
+.chat-send {
+  width:42px;height:42px;border-radius:50%;flex-shrink:0;
+  background:var(--green);border:none;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .2s;
+}
+.chat-send:active { transform:scale(.9) }
+.chat-send svg { width:20px;height:20px;stroke:white;stroke-width:2.5;fill:none }
+
+/* ===== WEEKLY VIEW ===== */
+.week-grid { padding:0 24px }
+.week-day {
+  display:flex;align-items:center;gap:14px;
+  padding:14px 0;
+  border-bottom:1px solid rgba(0,0,0,.04);
+}
+.week-day:last-child { border-bottom:none }
+.wd-label {
+  width:40px;font-family:'Nunito',sans-serif;
+  font-size:14px;font-weight:700;color:var(--text-soft);
+}
+.wd-dots { display:flex;gap:5px;flex:1 }
+.wd-dot {
+  width:12px;height:12px;border-radius:50%;
+  transition:all .2s;
+}
+.wd-dot.filled { background:var(--green) }
+.wd-dot.empty { background:var(--sand);opacity:.4 }
+.wd-dot.missed { background:var(--coral);opacity:.5 }
+.wd-score {
+  font-size:13px;font-weight:600;color:var(--text-muted);
+  width:36px;text-align:right;
+}
+.wd-star { display:inline-flex;vertical-align:middle;margin-left:2px }
+.week-day.today { background:var(--green-soft);margin:0 -24px;padding:14px 24px;border-radius:12px }
+
+.week-summary {
+  margin:20px 24px;padding:20px;
+  background:var(--card);border-radius:18px;
+  box-shadow:0 1px 3px var(--ws);
+}
+.ws-text {
+  font-family:'Nunito',sans-serif;font-size:15px;
+  font-weight:600;color:var(--text);line-height:1.6;
+  font-style:italic;
+}
+.ws-attr {
+  font-size:12px;color:var(--green);font-weight:600;
+  margin-top:8px;
+}
+
+/* ===== ADD TASK SCREEN ===== */
+.form-group {
+  padding:0 24px;margin-top:20px;
+}
+.form-label {
+  font-family:'Nunito',sans-serif;font-size:14px;
+  font-weight:700;color:var(--text-soft);
+  margin-bottom:8px;
+}
+.form-input {
+  width:100%;padding:14px 18px;
+  border-radius:14px;border:2px solid rgba(0,0,0,.06);
+  background:var(--card);
+  font-family:'Nunito',sans-serif;font-size:17px;
+  font-weight:600;color:var(--text);
+  outline:none;transition:border-color .2s;
+}
+.form-input:focus { border-color:var(--green) }
+.form-input::placeholder { color:var(--sand) }
+
+.repeat-options {
+  display:flex;gap:6px;flex-wrap:wrap;
+}
+.repeat-pill {
+  padding:8px 16px;border-radius:12px;
+  background:var(--card);border:2px solid rgba(0,0,0,.04);
+  font-size:13px;font-weight:600;color:var(--text-soft);
+  cursor:pointer;transition:all .2s;
+}
+.repeat-pill.selected {
+  background:var(--green-soft);border-color:var(--green);color:var(--green);
+}
+.day-pills {
+  display:flex;gap:4px;margin-top:8px;
+}
+.day-pill {
+  width:40px;height:40px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--card);border:2px solid rgba(0,0,0,.04);
+  font-size:12px;font-weight:700;color:var(--text-soft);
+  cursor:pointer;transition:all .2s;
+}
+.day-pill.selected {
+  background:var(--green);border-color:var(--green);color:white;
+}
+
+/* ===== ONBOARDING ===== */
+.onboard-screen {
+  padding:60px 32px 40px;
+  display:flex;flex-direction:column;
+  min-height:100%;
+}
+.onboard-icon {
+  width:80px;height:80px;border-radius:24px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:28px;
+}
+.onboard-icon svg { width:40px;height:40px;stroke:white;stroke-width:1.8;fill:none }
+.oi-green { background:linear-gradient(135deg,var(--green),var(--green-deep));box-shadow:0 12px 32px rgba(58,138,92,.2) }
+.oi-amber { background:linear-gradient(135deg,var(--amber),#9A7030);box-shadow:0 12px 32px rgba(184,134,62,.2) }
+.oi-coral { background:linear-gradient(135deg,var(--coral),#B85A46);box-shadow:0 12px 32px rgba(212,114,92,.2) }
+.oi-blue { background:linear-gradient(135deg,var(--blue),#143D7A);box-shadow:0 12px 32px rgba(27,79,160,.2) }
+
+.onboard-title {
+  font-family:'Nunito',sans-serif;font-size:28px;
+  font-weight:800;color:var(--text);line-height:1.2;
+  margin-bottom:10px;
+}
+.onboard-sub {
+  font-size:16px;color:var(--text-muted);font-weight:500;
+  line-height:1.5;margin-bottom:32px;
+}
+
+/* Onboarding chat */
+.onboard-chat {
+  flex:1;display:flex;flex-direction:column;gap:12px;
+  margin-bottom:20px;overflow-y:auto;
+}
+.ob-bubble {
+  max-width:85%;padding:14px 18px;
+  border-radius:20px;line-height:1.5;
+  font-size:15px;font-weight:500;
+  animation:fadeUp .4s ease;
+}
+.ob-ai {
+  background:var(--card);color:var(--text);
+  border-bottom-left-radius:6px;align-self:flex-start;
+  box-shadow:0 1px 3px var(--ws);
+}
+.ob-user {
+  background:var(--green);color:white;
+  border-bottom-right-radius:6px;align-self:flex-end;
+}
+.ob-tasks {
+  background:var(--green-soft);border-radius:16px;
+  padding:14px 18px;align-self:flex-start;
+  border:1.5px solid rgba(58,138,92,.15);
+  animation:fadeUp .4s ease;
+}
+.ob-task-item {
+  display:flex;align-items:center;gap:10px;
+  padding:6px 0;
+  font-family:'Nunito',sans-serif;font-size:14px;
+  font-weight:600;color:var(--text);
+}
+.ob-task-check {
+  width:22px;height:22px;border-radius:50%;
+  border:2px solid var(--green);flex-shrink:0;
+}
+.ob-task-time {
+  font-size:12px;color:var(--green);font-weight:600;
+  margin-left:auto;
+}
+
+/* ===== CONFIRMATION TOAST ===== */
+.toast {
+  position:absolute;top:60px;left:24px;right:24px;
+  padding:16px 20px;border-radius:16px;
+  background:var(--green);color:white;
+  font-family:'Nunito',sans-serif;font-size:15px;
+  font-weight:700;text-align:center;
+  z-index:100;
+  transform:translateY(-20px);opacity:0;
+  transition:all .3s cubic-bezier(.175,.885,.32,1.275);
+  pointer-events:none;
+}
+.toast.show { transform:translateY(0);opacity:1 }
+
+/* ===== DEMO BAR ===== */
+.demo-bar {
+  display:flex;align-items:center;gap:16px;margin-top:20px;
+  font-family:'Inter',sans-serif;flex-wrap:wrap;justify-content:center;
+}
+.demo-label {
+  font-size:10px;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;color:rgba(255,255,255,.25);
+}
+.modes {
+  display:flex;gap:2px;
+  background:rgba(255,255,255,.06);padding:3px;border-radius:10px;
+}
+.modes button {
+  padding:7px 14px;border:none;background:transparent;
+  color:rgba(255,255,255,.3);font-family:'Inter',sans-serif;
+  font-size:11px;font-weight:600;border-radius:7px;
+  cursor:pointer;transition:all .2s;letter-spacing:.3px;
+}
+.modes button:hover { color:rgba(255,255,255,.6) }
+.modes button.on { background:rgba(255,255,255,.1);color:rgba(255,255,255,.85) }
+.proto {
+  margin-top:10px;font-size:9px;color:rgba(255,255,255,.08);
+  letter-spacing:3px;text-transform:uppercase;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width:430px) {
+  body { padding:0;background:var(--bg) !important;justify-content:flex-start }
+  .phone-wrap { width:100%;height:100vh;border-radius:0;box-shadow:none }
+  .demo-bar,.proto { display:none }
+}
+</style>
+</head>
+<body>
+
+<div class="phone-wrap" id="phone">
+
+  <!-- ===== SCREEN: HOME ===== -->
+  <div class="screen active" id="scr-home">
+    <div class="status-bar">
+      <div class="sb-time">9:41</div>
+      <div class="sb-icons">
+        <svg viewBox="0 0 24 24"><path d="M1 1l4.2 4.2M1 5h4M5 1v4"/><path d="M18.8 18.8L23 23M23 19v4M19 23h4"/><rect x="8" y="2" width="8" height="20" rx="2"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg>
+        <svg viewBox="0 0 24 24"><rect x="1" y="6" width="18" height="12" rx="2"/><path d="M23 13v-2"/></svg>
+      </div>
+    </div>
+    <div class="top-nav">
+      <div class="nav-title">HomeBase</div>
+      <div class="nav-avatar" onclick="goScreen('settings')">S</div>
+    </div>
+
+    <div class="home-header">
+      <div class="home-recipient">
+        <div class="recipient-photo">M</div>
+        <div class="recipient-info">
+          <h2>Margaret's Day</h2>
+          <div class="recipient-status"><span class="status-dot"></span> Active — last seen 11:42 AM</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Morning -->
+    <div class="section">
+      <div class="time-group">
+        <div class="time-header">
+          <span class="time-icon"><svg viewBox="0 0 24 24" stroke="var(--coral)"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span>
+          <span class="time-label">Morning</span>
+          <span class="time-count">2 of 3</span>
+        </div>
+        <div class="task-card done" onclick="toggleTask(this)">
+          <div class="tc-accent morning"></div>
+          <div class="tc-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="tc-info"><div class="tc-name">Take morning medication</div><div class="tc-time">8:00 AM</div></div>
+        </div>
+        <div class="task-card done" onclick="toggleTask(this)">
+          <div class="tc-accent morning"></div>
+          <div class="tc-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="tc-info"><div class="tc-name">Eat breakfast</div><div class="tc-time">8:30 AM</div></div>
+        </div>
+        <div class="task-card" onclick="toggleTask(this)">
+          <div class="tc-accent morning"></div>
+          <div class="tc-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="tc-info"><div class="tc-name">Water the plants</div><div class="tc-time">9:30 AM</div></div>
+        </div>
+      </div>
+
+      <!-- Afternoon -->
+      <div class="time-group">
+        <div class="time-header">
+          <span class="time-icon"><svg viewBox="0 0 24 24" stroke="var(--green)"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span>
+          <span class="time-label">Afternoon</span>
+          <span class="time-count">0 of 2</span>
+        </div>
+        <div class="task-card" onclick="toggleTask(this)">
+          <div class="tc-accent afternoon"></div>
+          <div class="tc-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="tc-info"><div class="tc-name">Appointment with Dawn</div><div class="tc-time">2:00 PM</div></div>
+          <div class="tc-voice"><svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/></svg></div>
+        </div>
+        <div class="task-card" onclick="toggleTask(this)">
+          <div class="tc-accent afternoon"></div>
+          <div class="tc-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="tc-info"><div class="tc-name">Take afternoon medication</div><div class="tc-time">3:00 PM</div></div>
+        </div>
+      </div>
+
+      <!-- Evening -->
+      <div class="time-group">
+        <div class="time-header">
+          <span class="time-icon"><svg viewBox="0 0 24 24" stroke="var(--plum)"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
+          <span class="time-label">Evening</span>
+          <span class="time-count">0 of 2</span>
+        </div>
+        <div class="task-card" onclick="toggleTask(this)">
+          <div class="tc-accent evening"></div>
+          <div class="tc-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="tc-info"><div class="tc-name">Take evening medication</div><div class="tc-time">6:00 PM</div></div>
+        </div>
+        <div class="task-card" onclick="toggleTask(this)">
+          <div class="tc-accent evening"></div>
+          <div class="tc-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="tc-info"><div class="tc-name">Set out clothes for tomorrow</div><div class="tc-time">8:00 PM</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <button class="qa-btn" onclick="goScreen('voice')">
+        <div class="qa-icon qi-voice"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></div>
+        <span class="qa-label">Voice</span>
+      </button>
+      <button class="qa-btn" onclick="goScreen('photo')">
+        <div class="qa-icon qi-photo"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+        <span class="qa-label">Photo</span>
+      </button>
+      <button class="qa-btn" onclick="goScreen('ai')">
+        <div class="qa-icon qi-ai"><svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1.27A7 7 0 0 1 14 23h-4a7 7 0 0 1-6.73-4H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2Z"/><circle cx="9.5" cy="15.5" r="1.5" fill="white" stroke="none"/><circle cx="14.5" cy="15.5" r="1.5" fill="white" stroke="none"/></svg></div>
+        <span class="qa-label">AI Chat</span>
+      </button>
+    </div>
+
+    <!-- Add Task -->
+    <div style="padding:0 24px;margin:16px 0 20px">
+      <button class="send-btn" style="background:var(--card);color:var(--green);box-shadow:0 1px 3px var(--ws);border:2px dashed rgba(58,138,92,.2)" onclick="goScreen('add-task')">
+        ＋ Add Task or Reminder
+      </button>
+    </div>
+
+    <!-- Tab Bar -->
+    <div class="tab-bar">
+      <button class="tab active" onclick="goScreen('home')">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <span class="tab-label">Today</span>
+      </button>
+      <button class="tab" onclick="goScreen('weekly')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span class="tab-label">Week</span>
+      </button>
+      <button class="tab" style="position:relative" onclick="goScreen('ai')">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span class="tab-label">AI Chat</span>
+        <span class="tab-badge"></span>
+      </button>
+      <button class="tab" onclick="goScreen('settings')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span class="tab-label">Settings</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: VOICE ===== -->
+  <div class="screen" id="scr-voice">
+    <div class="status-bar"><div class="sb-time">9:41</div><div class="sb-icons"></div></div>
+    <div class="top-nav">
+      <button class="nav-back" onclick="goScreen('home')">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg> Back
+      </button>
+      <div class="nav-title" style="font-size:20px">Voice Message</div>
+      <div style="width:60px"></div>
+    </div>
+
+    <div class="record-area" id="rec-area">
+      <div class="rec-ring" id="rec-btn" onclick="toggleRecord()">
+        <svg id="rec-icon-mic" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+        <svg id="rec-icon-stop" viewBox="0 0 24 24" style="display:none"><rect x="6" y="6" width="12" height="12" rx="2" fill="white" stroke="none"/></svg>
+      </div>
+      <div class="rec-timer" id="rec-timer">0:00</div>
+      <div class="rec-hint" id="rec-hint">Tap to start recording</div>
+    </div>
+
+    <!-- AI Analysis (hidden until after recording) -->
+    <div class="ai-analysis" id="voice-analysis">
+      <div class="ai-tag">
+        <svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1.27A7 7 0 0 1 14 23h-4a7 7 0 0 1-6.73-4H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2Z"/></svg>
+        HomeBase AI
+      </div>
+      <div class="ai-transcript">"Don't forget, Dawn is coming at 2 today for your appointment. Love you Mom!"</div>
+      <div class="ai-suggestion" onclick="showToast('Task created — Dawn visit at 2:00 PM')">
+        <div class="ai-sug-icon si-task"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+        <div class="ai-sug-text">Create task: "Dawn visit" at 2:00 PM</div>
+        <div class="ai-sug-action">Add</div>
+      </div>
+      <div class="ai-suggestion" onclick="showToast('Reminder scheduled for 1:30 PM')">
+        <div class="ai-sug-icon si-clock"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="ai-sug-text">Schedule voice reminder at 1:30 PM</div>
+        <div class="ai-sug-action">Add</div>
+      </div>
+
+      <div class="schedule-picker" style="padding:0;margin-top:16px">
+        <div class="form-label">Send voice message at:</div>
+        <div class="time-pill-row">
+          <div class="time-pill" onclick="selectPill(this)">Now</div>
+          <div class="time-pill selected" onclick="selectPill(this)">1:30 PM</div>
+          <div class="time-pill" onclick="selectPill(this)">2:00 PM</div>
+          <div class="time-pill" onclick="selectPill(this)">Custom</div>
+        </div>
+      </div>
+      <button class="send-btn" style="margin-top:16px" onclick="showToast('Voice message scheduled for 1:30 PM');setTimeout(()=>goScreen('home'),800)">Send to Margaret</button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: PHOTO ===== -->
+  <div class="screen" id="scr-photo">
+    <div class="status-bar"><div class="sb-time">9:41</div><div class="sb-icons"></div></div>
+    <div class="top-nav">
+      <button class="nav-back" onclick="goScreen('home')">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg> Back
+      </button>
+      <div class="nav-title" style="font-size:20px">Send Photo</div>
+      <div style="width:60px"></div>
+    </div>
+
+    <div class="photo-preview" id="photo-preview" style="display:none">
+      <div class="photo-preview-img">
+        <img id="preview-img" src="https://images.unsplash.com/photo-1531983412531-1f49a365ffed?w=600&h=600&fit=crop&crop=faces" alt="">
+      </div>
+      <input class="caption-input" placeholder="Add a caption..." value="Lucy's first day of school!">
+      <button class="send-btn" onclick="showToast('Photo sent to Margaret');setTimeout(()=>goScreen('home'),800)">Send to Margaret</button>
+      <button class="send-btn" style="background:transparent;color:var(--text-muted);box-shadow:none;margin-top:4px" onclick="document.getElementById('photo-preview').style.display='none';document.getElementById('photo-select').style.display='block'">Choose Different</button>
+    </div>
+
+    <div id="photo-select">
+      <div class="section"><div class="section-label">Recent Photos</div></div>
+      <div class="photo-grid">
+        <div class="photo-thumb" onclick="selectPhoto('https://images.unsplash.com/photo-1531983412531-1f49a365ffed?w=400&h=400&fit=crop&crop=faces')">
+          <img src="https://images.unsplash.com/photo-1531983412531-1f49a365ffed?w=400&h=400&fit=crop&crop=faces" alt="">
+        </div>
+        <div class="photo-thumb" onclick="selectPhoto('https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?w=400&h=400&fit=crop&crop=faces')">
+          <img src="https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?w=400&h=400&fit=crop&crop=faces" alt="">
+        </div>
+        <div class="photo-thumb" onclick="selectPhoto('https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=400&h=400&fit=crop')">
+          <img src="https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=400&h=400&fit=crop" alt="">
+        </div>
+        <div class="photo-thumb" onclick="selectPhoto('https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=400&h=400&fit=crop')">
+          <img src="https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=400&h=400&fit=crop" alt="">
+        </div>
+        <div class="photo-thumb" onclick="selectPhoto('https://images.unsplash.com/photo-1474557157379-8aa74a6ef541?w=400&h=400&fit=crop&crop=faces')">
+          <img src="https://images.unsplash.com/photo-1474557157379-8aa74a6ef541?w=400&h=400&fit=crop&crop=faces" alt="">
+        </div>
+        <div class="photo-thumb" onclick="selectPhoto('https://images.unsplash.com/photo-1529686342540-1b43aec0df75?w=400&h=400&fit=crop')">
+          <img src="https://images.unsplash.com/photo-1529686342540-1b43aec0df75?w=400&h=400&fit=crop" alt="">
+        </div>
+      </div>
+      <div style="padding:20px 24px">
+        <button class="send-btn" style="background:var(--card);color:var(--coral);box-shadow:0 1px 3px var(--ws);border:2px dashed rgba(212,114,92,.2)">
+          Take New Photo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: AI CHAT ===== -->
+  <div class="screen" id="scr-ai" style="overflow:hidden">
+    <div class="status-bar" style="flex-shrink:0"><div class="sb-time">9:41</div><div class="sb-icons"></div></div>
+    <div class="top-nav" style="flex-shrink:0">
+      <button class="nav-back" onclick="goScreen('home')">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg> Back
+      </button>
+      <div class="nav-title" style="font-size:20px">HomeBase AI</div>
+      <div style="width:60px"></div>
+    </div>
+
+    <div class="chat-messages" id="chat-messages">
+      <div class="chat-bubble chat-ai">
+        <div class="chat-ai-label">HomeBase AI</div>
+        <div>Hi Sarah — here's Margaret's update:</div>
+        <div style="margin-top:10px">
+          <strong>Morning:</strong> 2 of 3 tasks completed<br>
+          <strong>Last active:</strong> 11:42 AM<br>
+          <strong>Mood:</strong> Good morning — she checked off meds and breakfast right on schedule.
+        </div>
+        <div style="margin-top:10px;font-size:14px;color:var(--text-muted)">She hasn't watered the plants yet, but that's within her normal pattern.</div>
+      </div>
+
+      <div class="chat-bubble chat-user">She gets confused in the evenings lately. What can I do?</div>
+
+      <div class="chat-bubble chat-ai">
+        <div class="chat-ai-label">HomeBase AI</div>
+        <div>That's called <strong>sundowning</strong> — it's very common with dementia, especially in the late afternoon and evening. Here are some things that help:</div>
+        <ol>
+          <li><strong>Keep lights warm and bright</strong> before sunset — darkness triggers confusion</li>
+          <li><strong>Reduce stimulation after 4 PM</strong> — turn off news, lower background noise</li>
+          <li><strong>A familiar voice</strong> at 5 PM can re-anchor her — your voice is her anchor</li>
+          <li><strong>Simple evening routine</strong> — same tasks, same order, every night</li>
+        </ol>
+        <div class="chat-action-row">
+          <button class="chat-action filled" onclick="showToast('Evening voice reminder added at 5:00 PM')">Add 5 PM reminder</button>
+          <button class="chat-action" onclick="addAiResponse()">Tell me more</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex-shrink:0;display:flex;align-items:center;gap:10px;padding:12px 20px;background:rgba(250,247,242,.95);border-top:1px solid rgba(0,0,0,.04)">
+      <input class="chat-input" placeholder="Ask about Margaret's care..." id="chat-input" onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="chat-send" onclick="sendChat()">
+        <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+
+    <div class="tab-bar" style="position:relative">
+      <button class="tab" onclick="goScreen('home')">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <span class="tab-label">Today</span>
+      </button>
+      <button class="tab" onclick="goScreen('weekly')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span class="tab-label">Week</span>
+      </button>
+      <button class="tab active" style="position:relative" onclick="goScreen('ai')">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span class="tab-label">AI Chat</span>
+      </button>
+      <button class="tab" onclick="goScreen('settings')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span class="tab-label">Settings</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: WEEKLY ===== -->
+  <div class="screen" id="scr-weekly">
+    <div class="status-bar"><div class="sb-time">9:41</div><div class="sb-icons"></div></div>
+    <div class="top-nav">
+      <div class="nav-title">This Week</div>
+      <div class="nav-avatar">S</div>
+    </div>
+
+    <div class="home-header">
+      <div class="home-recipient">
+        <div class="recipient-photo">M</div>
+        <div class="recipient-info">
+          <h2>Margaret's Week</h2>
+          <div class="recipient-status" style="color:var(--text-muted)">March 10 – 16, 2026</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" style="margin-top:24px">
+      <div class="week-grid">
+        <div class="week-day">
+          <div class="wd-label">Mon</div>
+          <div class="wd-dots">
+            <div class="wd-dot filled"></div><div class="wd-dot filled"></div><div class="wd-dot filled"></div><div class="wd-dot filled"></div><div class="wd-dot missed"></div>
+          </div>
+          <div class="wd-score">4/5</div>
+        </div>
+        <div class="week-day">
+          <div class="wd-label">Tue</div>
+          <div class="wd-dots">
+            <div class="wd-dot filled"></div><div class="wd-dot filled"></div><div class="wd-dot filled"></div><div class="wd-dot filled"></div><div class="wd-dot filled"></div>
+          </div>
+          <div class="wd-score">5/5 <span class="wd-star"><svg viewBox="0 0 24 24" width="14" height="14" fill="var(--amber)" stroke="var(--amber)" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span></div>
+        </div>
+        <div class="week-day today">
+          <div class="wd-label">Wed</div>
+          <div class="wd-dots">
+            <div class="wd-dot filled"></div><div class="wd-dot filled"></div><div class="wd-dot empty"></div><div class="wd-dot empty"></div><div class="wd-dot empty"></div><div class="wd-dot empty"></div><div class="wd-dot empty"></div>
+          </div>
+          <div class="wd-score">2/7</div>
+        </div>
+        <div class="week-day">
+          <div class="wd-label">Thu</div>
+          <div class="wd-dots">
+            <div class="wd-dot empty" style="opacity:.15"></div><div class="wd-dot empty" style="opacity:.15"></div><div class="wd-dot empty" style="opacity:.15"></div>
+          </div>
+          <div class="wd-score" style="opacity:.3">—</div>
+        </div>
+        <div class="week-day">
+          <div class="wd-label">Fri</div>
+          <div class="wd-dots">
+            <div class="wd-dot empty" style="opacity:.15"></div><div class="wd-dot empty" style="opacity:.15"></div><div class="wd-dot empty" style="opacity:.15"></div>
+          </div>
+          <div class="wd-score" style="opacity:.3">—</div>
+        </div>
+        <div class="week-day">
+          <div class="wd-label">Sat</div>
+          <div class="wd-dots">
+            <div class="wd-dot empty" style="opacity:.15"></div><div class="wd-dot empty" style="opacity:.15"></div><div class="wd-dot empty" style="opacity:.15"></div>
+          </div>
+          <div class="wd-score" style="opacity:.3">—</div>
+        </div>
+        <div class="week-day">
+          <div class="wd-label">Sun</div>
+          <div class="wd-dots">
+            <div class="wd-dot empty" style="opacity:.15"></div><div class="wd-dot empty" style="opacity:.15"></div><div class="wd-dot empty" style="opacity:.15"></div>
+          </div>
+          <div class="wd-score" style="opacity:.3">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="week-summary">
+      <div class="ws-text">"Good start to the week. Mornings are strong — Margaret's been consistent with meds and breakfast. Evenings could use a little more support. Consider adding a 5 PM voice check-in."</div>
+      <div class="ws-attr">— HomeBase AI</div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Patterns</div>
+      <div class="task-card" style="border-left-color:var(--green)">
+        <div class="tc-info">
+          <div class="tc-name" style="font-size:14px">Morning meds — 100% this week</div>
+          <div class="tc-time">Completed at 8:00 AM every day</div>
+        </div>
+      </div>
+      <div class="task-card" style="border-left-color:var(--coral);margin-top:6px">
+        <div class="tc-info">
+          <div class="tc-name" style="font-size:14px">Evening tasks trending down</div>
+          <div class="tc-time">Completed 60% vs. 85% last week</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:20px"></div>
+
+    <div class="tab-bar">
+      <button class="tab" onclick="goScreen('home')">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <span class="tab-label">Today</span>
+      </button>
+      <button class="tab active" onclick="goScreen('weekly')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span class="tab-label">Week</span>
+      </button>
+      <button class="tab" style="position:relative" onclick="goScreen('ai')">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span class="tab-label">AI Chat</span>
+      </button>
+      <button class="tab" onclick="goScreen('settings')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span class="tab-label">Settings</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: ADD TASK ===== -->
+  <div class="screen" id="scr-add-task">
+    <div class="status-bar"><div class="sb-time">9:41</div><div class="sb-icons"></div></div>
+    <div class="top-nav">
+      <button class="nav-back" onclick="goScreen('home')">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg> Back
+      </button>
+      <div class="nav-title" style="font-size:20px">Add Task</div>
+      <div style="width:60px"></div>
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">What needs to happen?</div>
+      <input class="form-input" placeholder="e.g., Take afternoon medication" value="">
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">Time of day</div>
+      <div class="time-pill-row">
+        <div class="time-pill" onclick="selectPill(this)">Morning</div>
+        <div class="time-pill selected" onclick="selectPill(this)">Afternoon</div>
+        <div class="time-pill" onclick="selectPill(this)">Evening</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">Specific time (optional)</div>
+      <input class="form-input" type="time" value="14:00" style="font-size:16px">
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">Repeat</div>
+      <div class="repeat-options">
+        <div class="repeat-pill" onclick="selectRepeat(this)">Just today</div>
+        <div class="repeat-pill selected" onclick="selectRepeat(this)">Every day</div>
+        <div class="repeat-pill" onclick="selectRepeat(this)">Weekdays</div>
+        <div class="repeat-pill" onclick="selectRepeat(this)">Custom</div>
+      </div>
+      <div class="day-pills" style="margin-top:12px;display:none" id="custom-days">
+        <div class="day-pill selected" onclick="this.classList.toggle('selected')">M</div>
+        <div class="day-pill selected" onclick="this.classList.toggle('selected')">T</div>
+        <div class="day-pill selected" onclick="this.classList.toggle('selected')">W</div>
+        <div class="day-pill selected" onclick="this.classList.toggle('selected')">T</div>
+        <div class="day-pill selected" onclick="this.classList.toggle('selected')">F</div>
+        <div class="day-pill" onclick="this.classList.toggle('selected')">S</div>
+        <div class="day-pill" onclick="this.classList.toggle('selected')">S</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">Attach a voice message (optional)</div>
+      <button class="send-btn" style="background:var(--green-soft);color:var(--green);box-shadow:none" onclick="goScreen('voice')">
+        Record Voice Clip
+      </button>
+    </div>
+
+    <div style="padding:0 24px;margin-top:24px;padding-bottom:40px">
+      <button class="send-btn" onclick="showToast('Task added to Margaret\'s afternoon');setTimeout(()=>goScreen('home'),800)">Add Task</button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: ONBOARDING ===== -->
+  <div class="screen" id="scr-onboard">
+    <div class="status-bar"><div class="sb-time">9:41</div><div class="sb-icons"></div></div>
+
+    <div class="onboard-screen">
+      <div class="onboard-icon oi-green">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <div class="onboard-title">Let's set up Margaret's HomeBase</div>
+      <div class="onboard-sub">Just tell me about her day. I'll create the perfect routine.</div>
+
+      <div class="onboard-chat" id="onboard-chat">
+        <div class="ob-bubble ob-ai">
+          <div class="chat-ai-label">HomeBase AI</div>
+          What does Margaret's morning usually look like? Just describe it naturally — I'll organize everything.
+        </div>
+
+        <div class="ob-bubble ob-user">She takes her meds around 8, has breakfast, then usually waters her plants. She has a caregiver Dawn who visits in the afternoon.</div>
+
+        <div class="ob-bubble ob-ai">
+          <div class="chat-ai-label">HomeBase AI</div>
+          Got it! Here's what I've set up for Margaret's morning:
+        </div>
+
+        <div class="ob-tasks">
+          <div class="ob-task-item">
+            <div class="ob-task-check"></div>
+            Take morning medication
+            <div class="ob-task-time">8:00 AM</div>
+          </div>
+          <div class="ob-task-item">
+            <div class="ob-task-check"></div>
+            Eat breakfast
+            <div class="ob-task-time">8:30 AM</div>
+          </div>
+          <div class="ob-task-item">
+            <div class="ob-task-check"></div>
+            Water the plants
+            <div class="ob-task-time">9:30 AM</div>
+          </div>
+          <div class="ob-task-item">
+            <div class="ob-task-check"></div>
+            Dawn's visit
+            <div class="ob-task-time">2:00 PM</div>
+          </div>
+        </div>
+
+        <div class="ob-bubble ob-ai">
+          <div class="chat-ai-label">HomeBase AI</div>
+          Look good? I can adjust times or add more. What about her evenings?
+        </div>
+
+        <div class="ob-bubble ob-user">Evenings she takes her meds at 6, has dinner, and likes to set out clothes for the next day before bed.</div>
+
+        <div class="ob-bubble ob-ai">
+          <div class="chat-ai-label">HomeBase AI</div>
+          Perfect. I've added her evening routine:
+        </div>
+
+        <div class="ob-tasks">
+          <div class="ob-task-item">
+            <div class="ob-task-check"></div>
+            Take evening medication
+            <div class="ob-task-time">6:00 PM</div>
+          </div>
+          <div class="ob-task-item">
+            <div class="ob-task-check"></div>
+            Dinner
+            <div class="ob-task-time">6:30 PM</div>
+          </div>
+          <div class="ob-task-item">
+            <div class="ob-task-check"></div>
+            Set out clothes for tomorrow
+            <div class="ob-task-time">8:00 PM</div>
+          </div>
+        </div>
+
+        <div class="ob-bubble ob-ai">
+          <div class="chat-ai-label">HomeBase AI</div>
+          Margaret's routine is all set. Want to record a welcome voice message for her? She'll hear it tomorrow morning.
+          <div class="chat-action-row" style="margin-top:12px">
+            <button class="chat-action filled" onclick="goScreen('voice')">Record welcome</button>
+            <button class="chat-action" onclick="showToast('Routine saved! Pairing display...')">Skip for now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: SETTINGS (minimal) ===== -->
+  <div class="screen" id="scr-settings">
+    <div class="status-bar"><div class="sb-time">9:41</div><div class="sb-icons"></div></div>
+    <div class="top-nav">
+      <div class="nav-title">Settings</div>
+      <div style="width:40px"></div>
+    </div>
+
+    <div class="section" style="margin-top:24px">
+      <div class="section-label">Recipient</div>
+      <div class="task-card" style="border-left-color:var(--amber)">
+        <div class="recipient-photo" style="width:44px;height:44px;font-size:17px;border-width:2px">M</div>
+        <div class="tc-info">
+          <div class="tc-name" style="font-size:16px">Margaret</div>
+          <div class="tc-time">HomeBase active since March 11, 2026</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Caregivers</div>
+      <div class="task-card" style="border-left-color:var(--green)">
+        <div class="nav-avatar" style="width:36px;height:36px;font-size:14px">S</div>
+        <div class="tc-info">
+          <div class="tc-name" style="font-size:15px">Sarah (You)</div>
+          <div class="tc-time">Admin · Primary caregiver</div>
+        </div>
+      </div>
+      <div class="task-card" style="border-left-color:var(--blue);margin-top:6px">
+        <div class="nav-avatar" style="width:36px;height:36px;font-size:14px;background:linear-gradient(135deg,var(--coral),#B85A46)">M</div>
+        <div class="tc-info">
+          <div class="tc-name" style="font-size:15px">Megan</div>
+          <div class="tc-time">Contributor · Professional caregiver</div>
+        </div>
+      </div>
+      <button class="send-btn" style="margin:12px 0 0;background:var(--card);color:var(--green);box-shadow:0 1px 3px var(--ws);border:2px dashed rgba(58,138,92,.2);font-size:14px;padding:12px">＋ Invite Caregiver</button>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Display</div>
+      <div class="task-card" style="border-left-color:var(--green)">
+        <div class="tc-info">
+          <div class="tc-name" style="font-size:15px">Margaret's iPad</div>
+          <div class="tc-time" style="color:var(--green)">● Connected · Last sync 2 min ago</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Quiet Hours</div>
+      <div class="task-card" style="border-left-color:var(--plum)">
+        <div class="tc-info">
+          <div class="tc-name" style="font-size:15px">9:00 PM — 7:00 AM</div>
+          <div class="tc-time">No reminders during quiet hours</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Alerts</div>
+      <div class="task-card" style="border-left-color:var(--coral)">
+        <div class="tc-info">
+          <div class="tc-name" style="font-size:15px">Inactivity alert after 3 hours</div>
+          <div class="tc-time">Push notification to all caregivers</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:20px"></div>
+
+    <div class="tab-bar">
+      <button class="tab" onclick="goScreen('home')">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <span class="tab-label">Today</span>
+      </button>
+      <button class="tab" onclick="goScreen('weekly')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span class="tab-label">Week</span>
+      </button>
+      <button class="tab" style="position:relative" onclick="goScreen('ai')">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span class="tab-label">AI Chat</span>
+      </button>
+      <button class="tab active" onclick="goScreen('settings')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span class="tab-label">Settings</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+</div>
+
+<!-- Demo Bar -->
+<div class="demo-bar">
+  <div class="demo-label">Screen</div>
+  <div class="modes" id="demo-modes">
+    <button class="on" onclick="goScreen('home')">Today</button>
+    <button onclick="goScreen('weekly')">Week</button>
+    <button onclick="goScreen('voice')">Voice</button>
+    <button onclick="goScreen('photo')">Photo</button>
+    <button onclick="goScreen('ai')">AI Chat</button>
+    <button onclick="goScreen('add-task')">Add Task</button>
+    <button onclick="goScreen('onboard')">Setup</button>
+  </div>
+</div>
+<div class="proto">HomeBase Caregiver App — Interactive Prototype</div>
+
+<script>
+// === SCREEN NAVIGATION ===
+function goScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const scr = document.getElementById('scr-' + id);
+  if (scr) { scr.classList.add('active'); scr.scrollTop = 0 }
+
+  // Update demo bar
+  const labels = { home:'Today', weekly:'Week', voice:'Voice', photo:'Photo', ai:'AI Chat', 'add-task':'Add Task', onboard:'Setup', settings:'Settings' };
+  document.querySelectorAll('#demo-modes button').forEach(b => {
+    b.classList.toggle('on', b.textContent === (labels[id] || ''));
+  });
+}
+
+// === TASK TOGGLE ===
+function toggleTask(el) {
+  el.classList.toggle('done');
+  // Update count
+  const group = el.closest('.time-group');
+  if (group) {
+    const tasks = group.querySelectorAll('.task-card');
+    const done = group.querySelectorAll('.task-card.done').length;
+    const count = group.querySelector('.time-count');
+    if (count) count.textContent = done + ' of ' + tasks.length;
+  }
+}
+
+// === VOICE RECORDING DEMO ===
+let recording = false;
+let recInterval = null;
+let recSeconds = 0;
+
+function toggleRecord() {
+  const btn = document.getElementById('rec-btn');
+  const hint = document.getElementById('rec-hint');
+  const timer = document.getElementById('rec-timer');
+  const micIcon = document.getElementById('rec-icon-mic');
+  const stopIcon = document.getElementById('rec-icon-stop');
+  const analysis = document.getElementById('voice-analysis');
+
+  if (!recording) {
+    recording = true;
+    btn.classList.add('recording');
+    micIcon.style.display = 'none';
+    stopIcon.style.display = 'block';
+    hint.textContent = 'Tap to stop recording';
+    recSeconds = 0;
+    analysis.classList.remove('show');
+    recInterval = setInterval(() => {
+      recSeconds++;
+      const m = Math.floor(recSeconds / 60);
+      const s = recSeconds % 60;
+      timer.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+    }, 1000);
+  } else {
+    recording = false;
+    clearInterval(recInterval);
+    btn.classList.remove('recording');
+    micIcon.style.display = 'block';
+    stopIcon.style.display = 'none';
+    hint.textContent = 'Tap to record again';
+    // Show AI analysis after brief delay
+    setTimeout(() => {
+      analysis.classList.add('show');
+      analysis.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 400);
+  }
+}
+
+// === PHOTO SELECT ===
+function selectPhoto(url) {
+  document.getElementById('preview-img').src = url;
+  document.getElementById('photo-select').style.display = 'none';
+  document.getElementById('photo-preview').style.display = 'flex';
+}
+
+// === PILL SELECT ===
+function selectPill(el) {
+  el.parentElement.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectRepeat(el) {
+  el.parentElement.querySelectorAll('.repeat-pill').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  const custom = document.getElementById('custom-days');
+  if (el.textContent === 'Custom') {
+    custom.style.display = 'flex';
+  } else {
+    custom.style.display = 'none';
+  }
+}
+
+// === CHAT ===
+const chatResponses = [
+  { q: /remind|voice|message/i, a: 'I can help with that! Would you like me to schedule a voice reminder for Margaret? Just tell me what to say and when.' },
+  { q: /medication|meds|medicine/i, a: 'Margaret\'s medication schedule is set for 8 AM, 3 PM, and 6 PM daily. She\'s been 100% consistent with morning meds this week. Want me to adjust any of the times?' },
+  { q: /how.*(doing|is she|day)/i, a: 'Margaret\'s having a good day! She completed her morning routine on time. She watered the plants a bit later than usual but that\'s within her normal range. Dawn\'s visit is at 2 PM today.' },
+  { q: /help|what can you/i, a: 'I can help you with:\n\n• Check on Margaret\'s day or week\n• Add tasks or reminders\n• Schedule voice messages\n• Adjust her routine\n• Tips for caregiving challenges\n• Send photos to her display\n\nJust ask naturally.' },
+];
+
+function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+
+  const messages = document.getElementById('chat-messages');
+
+  // Add user message
+  const userBubble = document.createElement('div');
+  userBubble.className = 'chat-bubble chat-user';
+  userBubble.textContent = msg;
+  messages.appendChild(userBubble);
+  messages.scrollTop = messages.scrollHeight;
+
+  // Find matching response
+  let response = 'I\'m here to help with Margaret\'s care. You can ask me about her day, schedule changes, caregiving tips, or anything else. What would you like to know?';
+  for (const r of chatResponses) {
+    if (r.q.test(msg)) { response = r.a; break }
+  }
+
+  // Add AI response with delay
+  setTimeout(() => {
+    const aiBubble = document.createElement('div');
+    aiBubble.className = 'chat-bubble chat-ai';
+    aiBubble.innerHTML = '<div class="chat-ai-label">HomeBase AI</div>' + response.replace(/\n/g, '<br>');
+    messages.appendChild(aiBubble);
+    messages.scrollTop = messages.scrollHeight;
+  }, 600);
+}
+
+function addAiResponse() {
+  const messages = document.getElementById('chat-messages');
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble chat-ai';
+  bubble.innerHTML = '<div class="chat-ai-label">HomeBase AI</div>' +
+    '<div><strong>More about sundowning:</strong></div>' +
+    '<div style="margin-top:8px">Sundowning happens because the brain\'s internal clock gets disrupted by dementia. The fading light triggers anxiety and confusion.</div>' +
+    '<div style="margin-top:8px"><strong>What works best:</strong></div>' +
+    '<ul><li>Play familiar music from her era between 4-6 PM</li>' +
+    '<li>Have photos of family visible — recognition calms</li>' +
+    '<li>Keep dinner at the same time every night</li>' +
+    '<li>A warm voice message at 5 PM acts as an anchor — "Hey Mom, you\'re having a great day"</li></ul>' +
+    '<div style="margin-top:8px;font-size:13px;color:var(--text-muted)">Source: Teepa Snow\'s PAC methodology + Bredesen ReCODE Protocol</div>';
+  messages.appendChild(bubble);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+// === TOAST ===
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
